@@ -10,6 +10,7 @@ import Agenda from "./pages/Agenda";
 import Financeiro from "./pages/Financeiro";
 import Documentos from "./pages/Documentos";
 import Prontuario from "./pages/Prontuario";
+import MapaEvolucao from "./pages/MapaEvolucao";
 
 function App() {
 
@@ -38,36 +39,43 @@ function App() {
                     }
                 />
                 <Route path="/agenda"
-                element={
-                    <PrivateRoute>
-                        <DashboardLayout>
-                            <Agenda />
-                        </DashboardLayout>
-                    </PrivateRoute>} />
+                    element={
+                        <PrivateRoute>
+                            <DashboardLayout>
+                                <Agenda />
+                            </DashboardLayout>
+                        </PrivateRoute>} />
 
                 <Route path="/financeiro"
-                element={
-                    <PrivateRoute>
-                        <DashboardLayout>
-                            <Financeiro />
-                        </DashboardLayout>
-                    </PrivateRoute>} />
+                    element={
+                        <PrivateRoute>
+                            <DashboardLayout>
+                                <Financeiro />
+                            </DashboardLayout>
+                        </PrivateRoute>} />
 
                 <Route path="/documentos"
-                element={
-                    <PrivateRoute>
-                        <DashboardLayout>
-                            <Documentos />
-                        </DashboardLayout>
-                    </PrivateRoute>} />
+                    element={
+                        <PrivateRoute>
+                            <DashboardLayout>
+                                <Documentos />
+                            </DashboardLayout>
+                        </PrivateRoute>} />
 
                 <Route path="/prontuario"
-                element={
-                    <PrivateRoute>
-                        <DashboardLayout>
-                            <Prontuario />
-                        </DashboardLayout>
-                    </PrivateRoute>} />
+                    element={
+                        <PrivateRoute>
+                            <DashboardLayout>
+                                <Prontuario />
+                            </DashboardLayout>
+                        </PrivateRoute>} />
+                <Route path="/mapa-evolucao"
+                    element={
+                        <PrivateRoute>
+                            <DashboardLayout>
+                                <MapaEvolucao />
+                            </DashboardLayout>
+                        </PrivateRoute>} />
             </Routes>
         </BrowserRouter>
     );

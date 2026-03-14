@@ -5,7 +5,6 @@ import {
     editarPaciente,
     deletarPaciente
 } from "../services/pacientesService";
-
 import Card from "../components/Card";
 
 function Pacientes() {
@@ -71,22 +70,14 @@ function Pacientes() {
                     </p>
                 </div>
 
-                <input
-                    type="text"
-                    placeholder="Buscar paciente..."
-                    value={busca}
-                    onChange={(e) => setBusca(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+                
 
             </div>
 
             {/* Criar paciente */}
 
             <Card>
-
                 <div className="flex gap-2">
-
                     <input
                         type="text"
                         placeholder="Nome do paciente"
@@ -94,26 +85,29 @@ function Pacientes() {
                         onChange={(e) => setNovoNome(e.target.value)}
                         className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
                     />
-
                     <button
                         onClick={handleCriar}
                         className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm"
                     >
                         Adicionar
                     </button>
-
                 </div>
-
             </Card>
 
-            {pacientesFiltrados.length === 0 && (
+            <input
+                    type="text"
+                    placeholder="Buscar paciente..."
+                    value={busca}
+                    onChange={(e) => setBusca(e.target.value)}
+                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
 
+            {pacientesFiltrados.length === 0 && (
                 <Card>
                     <p className="text-gray-500 text-sm">
                         Nenhum paciente encontrado.
                     </p>
                 </Card>
-
             )}
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

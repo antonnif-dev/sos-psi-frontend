@@ -10,6 +10,10 @@ function Prontuario() {
     const [editando, setEditando] = useState(null);
     const [pacientes, setPacientes] = useState([]);
     const [sugestoes, setSugestoes] = useState([]);
+    const [humor, setHumor] = useState("");
+    const [ansiedade, setAnsiedade] = useState("");
+    const [estresse, setEstresse] = useState("");
+    const [sono, setSono] = useState("");
 
     async function carregar() {
         const dados = await listarProntuarios();
@@ -42,7 +46,12 @@ function Prontuario() {
         e.preventDefault();
         const data = {
             paciente,
-            observacoes
+            observacoes,
+            humor,
+            ansiedade,
+            estresse,
+            sono,
+            dataSessao: new Date()
         };
         if (editando) {
             await editarProntuario(editando, data);
@@ -51,6 +60,10 @@ function Prontuario() {
         }
         setPaciente("");
         setObservacoes("");
+        setHumor("");
+        setAnsiedade("");
+        setEstresse("");
+        setSono("");
         setEditando(null);
         carregar();
     }
@@ -153,6 +166,50 @@ function Prontuario() {
                                 ))}
                             </div>
                         )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+
+                        <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            placeholder="Humor (1-10)"
+                            value={humor}
+                            onChange={(e) => setHumor(Number(e.target.value))}
+                            className="border rounded p-2"
+                        />
+
+                        <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            placeholder="Ansiedade (1-10)"
+                            value={ansiedade}
+                            onChange={(e) => setAnsiedade(Number(e.target.value))}
+                            className="border rounded p-2"
+                        />
+
+                        <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            placeholder="Estresse (1-10)"
+                            value={estresse}
+                            onChange={(e) => setEstresse(Number(e.target.value))}
+                            className="border rounded p-2"
+                        />
+
+                        <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            placeholder="Sono (1-10)"
+                            value={sono}
+                            onChange={(e) => setSono(Number(e.target.value))}
+                            className="border rounded p-2"
+                        />
+
                     </div>
 
                     <textarea
