@@ -5,12 +5,12 @@ import Dashboard from "./pages/Dashboard";
 import Pacientes from "./pages/Pacientes";
 import PrivateRoute from "./routes/PrivateRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
-
 import Agenda from "./pages/Agenda";
 import Financeiro from "./pages/Financeiro";
 import Documentos from "./pages/Documentos";
 import Prontuario from "./pages/Prontuario";
 import MapaEvolucao from "./pages/MapaEvolucao";
+import Configuracoes from "./pages/Configuracoes";
 
 function App() {
 
@@ -74,6 +74,13 @@ function App() {
                         <PrivateRoute>
                             <DashboardLayout>
                                 <MapaEvolucao />
+                            </DashboardLayout>
+                        </PrivateRoute>} />
+                <Route path="/configuracoes"
+                    element={
+                        <PrivateRoute>
+                            <DashboardLayout>
+                                <Configuracoes />
                             </DashboardLayout>
                         </PrivateRoute>} />
             </Routes>
