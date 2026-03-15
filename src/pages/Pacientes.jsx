@@ -6,13 +6,27 @@ import {
     deletarPaciente
 } from "../services/pacientesService";
 import Card from "../components/Card";
+import { useNavigate } from "react-router-dom";
 
 function Pacientes() {
+
     const [pacientes, setPacientes] = useState([]);
     const [busca, setBusca] = useState("");
-    const [novoNome, setNovoNome] = useState("");
+    const navigate = useNavigate();
+
+    const [novoPaciente, setNovoPaciente] = useState({
+        nome: "",
+        telefone: "",
+        email: "",
+        dataNascimento: "",
+        profissao: "",
+        valorSessao: "",
+        status: "ativo",
+        observacoes: ""
+    });
+
     const [editandoId, setEditandoId] = useState(null);
-    const [nomeEditado, setNomeEditado] = useState("");
+    const [pacienteEditado, setPacienteEditado] = useState({});
 
     async function carregarPacientes() {
         const data = await listarPacientes();
@@ -28,20 +42,32 @@ function Pacientes() {
     );
 
     async function handleCriar() {
-        if (!novoNome) return;
-        await criarPaciente({
-            nome: novoNome
+
+        if (!novoPaciente.nome) return;
+
+        await criarPaciente(novoPaciente);
+
+        setNovoPaciente({
+            nome: "",
+            telefone: "",
+            email: "",
+            dataNascimento: "",
+            profissao: "",
+            valorSessao: "",
+            status: "ativo",
+            observacoes: ""
         });
-        setNovoNome("");
+
         carregarPacientes();
     }
 
     async function handleEditar(id) {
-        await editarPaciente(id, {
-            nome: nomeEditado
-        });
+
+        await editarPaciente(id, pacienteEditado);
+
         setEditandoId(null);
-        setNomeEditado("");
+        setPacienteEditado({});
+
         carregarPacientes();
     }
 
@@ -52,91 +78,126 @@ function Pacientes() {
         await deletarPaciente(id);
 
         carregarPacientes();
-
     }
 
     return (
         <div className="space-y-6">
 
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h1 className="text-2xl font-semibold text-gray-800">
+                    Pacientes
+                </h1>
 
-                <div>
-                    <h1 className="text-2xl font-semibold text-gray-800">
-                        Pacientes
-                    </h1>
-
-                    <p className="text-sm text-gray-500">
-                        {pacientes.length} paciente(s) cadastrados
-                    </p>
-                </div>
-
-                
-
+                <p className="text-sm text-gray-500">
+                    {pacientes.length} paciente(s) cadastrados
+                </p>
             </div>
 
-            {/* Criar paciente */}
-
-            <Card>
-                <div className="flex gap-2">
-                    <input
-                        type="text"
-                        placeholder="Nome do paciente"
-                        value={novoNome}
-                        onChange={(e) => setNovoNome(e.target.value)}
-                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                    />
-                    <button
-                        onClick={handleCriar}
-                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm"
-                    >
-                        Adicionar
-                    </button>
-                </div>
-            </Card>
+            {/* BUSCA */}
 
             <input
-                    type="text"
-                    placeholder="Buscar paciente..."
-                    value={busca}
-                    onChange={(e) => setBusca(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+                type="text"
+                placeholder="Buscar paciente..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            />
 
-            {pacientesFiltrados.length === 0 && (
-                <Card>
-                    <p className="text-gray-500 text-sm">
-                        Nenhum paciente encontrado.
-                    </p>
-                </Card>
-            )}
+            {/* LISTA */}
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 
                 {pacientesFiltrados.map(p => (
 
-                    <Card key={p.id}>
+                    <Card
+                        key={p.id} onClick={() => {
+                            if (editandoId !== p.id) {
+                                navigate(`/pacientes/${p.id}`);
+                            }
+                        }}
+                        className={`transition ${editandoId !== p.id ? "cursor-pointer hover:shadow-md" : ""}`}
+                    >
 
                         {editandoId === p.id ? (
 
                             <div className="space-y-2">
 
                                 <input
-                                    value={nomeEditado}
-                                    onChange={(e) => setNomeEditado(e.target.value)}
+                                    placeholder="Nome"
+                                    value={pacienteEditado.nome || ""}
+                                    onChange={(e) => setPacienteEditado({ ...pacienteEditado, nome: e.target.value })}
+                                    className="border rounded px-2 py-1 text-sm w-full"
+                                />
+
+                                <input
+                                    placeholder="Telefone"
+                                    value={pacienteEditado.telefone || ""}
+                                    onChange={(e) => setPacienteEditado({ ...pacienteEditado, telefone: e.target.value })}
+                                    className="border rounded px-2 py-1 text-sm w-full"
+                                />
+
+                                <input
+                                    placeholder="Email"
+                                    value={pacienteEditado.email || ""}
+                                    onChange={(e) => setPacienteEditado({ ...pacienteEditado, email: e.target.value })}
+                                    className="border rounded px-2 py-1 text-sm w-full"
+                                />
+
+                                <input
+                                    type="date"
+                                    value={pacienteEditado.dataNascimento || ""}
+                                    onChange={(e) => setPacienteEditado({ ...pacienteEditado, dataNascimento: e.target.value })}
+                                    className="border rounded px-2 py-1 text-sm w-full"
+                                />
+
+                                <input
+                                    placeholder="Profissão"
+                                    value={pacienteEditado.profissao || ""}
+                                    onChange={(e) => setPacienteEditado({ ...pacienteEditado, profissao: e.target.value })}
+                                    className="border rounded px-2 py-1 text-sm w-full"
+                                />
+
+                                <input
+                                    placeholder="Valor da sessão"
+                                    value={pacienteEditado.valorSessao || ""}
+                                    onChange={(e) => setPacienteEditado({ ...pacienteEditado, valorSessao: e.target.value })}
+                                    className="border rounded px-2 py-1 text-sm w-full"
+                                />
+
+                                <select
+                                    value={pacienteEditado.status || "ativo"}
+                                    onChange={(e) => setPacienteEditado({ ...pacienteEditado, status: e.target.value })}
+                                    className="border rounded px-2 py-1 text-sm w-full"
+                                >
+                                    <option value="ativo">Ativo</option>
+                                    <option value="pausa">Em pausa</option>
+                                    <option value="encerrado">Encerrado</option>
+                                </select>
+
+                                <textarea
+                                    placeholder="Observações"
+                                    value={pacienteEditado.observacoes || ""}
+                                    onChange={(e) => setPacienteEditado({ ...pacienteEditado, observacoes: e.target.value })}
                                     className="border rounded px-2 py-1 text-sm w-full"
                                 />
 
                                 <div className="flex gap-2">
 
                                     <button
-                                        onClick={() => handleEditar(p.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditar(p.id);
+                                        }}
                                         className="text-sm bg-green-600 text-white px-2 py-1 rounded"
                                     >
                                         salvar
                                     </button>
 
                                     <button
-                                        onClick={() => setEditandoId(null)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEditandoId(null);
+                                        }}
                                         className="text-sm bg-gray-300 px-2 py-1 rounded"
                                     >
                                         cancelar
@@ -145,25 +206,33 @@ function Pacientes() {
                                 </div>
 
                             </div>
-
                         ) : (
 
                             <>
-
-                                <p className="text-sm text-gray-500 mb-1">
-                                    Paciente
-                                </p>
 
                                 <p className="text-lg font-medium text-gray-800">
                                     {p.nome}
                                 </p>
 
+                                <p className="text-sm text-gray-500">
+                                    {p.telefone}
+                                </p>
+
+                                <p className="text-sm text-gray-500">
+                                    {p.email}
+                                </p>
+
+                                <p className="text-xs text-gray-400 mt-1">
+                                    {p.status}
+                                </p>
+
                                 <div className="flex gap-2 mt-3">
 
                                     <button
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            e.stopPropagation();
                                             setEditandoId(p.id);
-                                            setNomeEditado(p.nome);
+                                            setPacienteEditado(p);
                                         }}
                                         className="text-xs bg-blue-500 text-white px-2 py-1 rounded"
                                     >
@@ -171,7 +240,10 @@ function Pacientes() {
                                     </button>
 
                                     <button
-                                        onClick={() => handleDeletar(p.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeletar(p.id);
+                                        }}
                                         className="text-xs bg-red-500 text-white px-2 py-1 rounded"
                                     >
                                         excluir
@@ -188,6 +260,86 @@ function Pacientes() {
                 ))}
 
             </div>
+
+            {/* CRIAR PACIENTE */}
+
+            <h1 className="text-2xl flex justify-center pt-5 font-semibold text-gray-800">
+                Criar Paciente
+            </h1>
+
+            <Card>
+
+                <div className="grid md:grid-cols-2 gap-3">
+
+                    <input
+                        placeholder="Nome"
+                        value={novoPaciente.nome}
+                        onChange={(e) => setNovoPaciente({ ...novoPaciente, nome: e.target.value })}
+                        className="border rounded px-3 py-2 text-sm"
+                    />
+
+                    <input
+                        placeholder="Telefone"
+                        value={novoPaciente.telefone}
+                        onChange={(e) => setNovoPaciente({ ...novoPaciente, telefone: e.target.value })}
+                        className="border rounded px-3 py-2 text-sm"
+                    />
+
+                    <input
+                        placeholder="Email"
+                        value={novoPaciente.email}
+                        onChange={(e) => setNovoPaciente({ ...novoPaciente, email: e.target.value })}
+                        className="border rounded px-3 py-2 text-sm"
+                    />
+
+                    <input
+                        type="date"
+                        value={novoPaciente.dataNascimento}
+                        onChange={(e) => setNovoPaciente({ ...novoPaciente, dataNascimento: e.target.value })}
+                        className="border rounded px-3 py-2 text-sm"
+                    />
+
+                    <input
+                        placeholder="Profissão"
+                        value={novoPaciente.profissao}
+                        onChange={(e) => setNovoPaciente({ ...novoPaciente, profissao: e.target.value })}
+                        className="border rounded px-3 py-2 text-sm"
+                    />
+
+                    <input
+                        placeholder="Valor da sessão"
+                        value={novoPaciente.valorSessao}
+                        onChange={(e) => setNovoPaciente({ ...novoPaciente, valorSessao: e.target.value })}
+                        className="border rounded px-3 py-2 text-sm"
+                    />
+
+                    <select
+                        value={novoPaciente.status}
+                        onChange={(e) => setNovoPaciente({ ...novoPaciente, status: e.target.value })}
+                        className="border rounded px-3 py-2 text-sm"
+                    >
+                        <option value="ativo">Ativo</option>
+                        <option value="pausa">Em pausa</option>
+                        <option value="encerrado">Encerrado</option>
+                    </select>
+
+                </div>
+
+                <textarea
+                    placeholder="Observações"
+                    value={novoPaciente.observacoes}
+                    onChange={(e) => setNovoPaciente({ ...novoPaciente, observacoes: e.target.value })}
+                    className="border rounded px-3 py-2 text-sm w-full mt-3"
+                />
+
+                <button
+                    onClick={handleCriar}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm mt-3"
+                >
+                    Adicionar paciente
+                </button>
+
+            </Card>
 
         </div>
     );

@@ -11,9 +11,9 @@ import Documentos from "./pages/Documentos";
 import Prontuario from "./pages/Prontuario";
 import MapaEvolucao from "./pages/MapaEvolucao";
 import Configuracoes from "./pages/Configuracoes";
+import PacientePerfil from "./pages/PacientePerfil";
 
 function App() {
-
     return (
         <BrowserRouter>
             <Routes>
@@ -81,6 +81,13 @@ function App() {
                         <PrivateRoute>
                             <DashboardLayout>
                                 <Configuracoes />
+                            </DashboardLayout>
+                        </PrivateRoute>} />
+                <Route path="/pacientes/:id"
+                    element={
+                        <PrivateRoute>
+                            <DashboardLayout>
+                                <PacientePerfil />
                             </DashboardLayout>
                         </PrivateRoute>} />
             </Routes>
