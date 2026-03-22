@@ -1,8 +1,8 @@
 import api from "./api"
 
-export const getNotificacoes = async () => {
-  const { data } = await api.get("/notificacoes")
-  return data
+export async function getNotificacoes(){
+  const res = await api.get("/notificacoes")
+  return res.data
 }
 
 export const getUnreadCount = async () => {

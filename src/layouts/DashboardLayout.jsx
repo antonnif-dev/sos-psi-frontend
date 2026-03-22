@@ -1,13 +1,12 @@
 import { Link } from "react-router-dom";
 import LogoutButton from "../components/LogoutButton";
 import { useEffect, useState } from "react";
-import { BellRing, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen, Settings } from "lucide-react";
 import { buscarTenant } from "../services/tenantService";
 import { auth, db } from "../services/firebase";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import { Settings } from "lucide-react";
-import NotificationDropdown from "../components/NotificationDropdown";
+import NotificationBell from "../components/NotificationBell"
 
 function DashboardLayout({ children }) {
     const [menuAberto, setMenuAberto] = useState(true);
@@ -58,13 +57,11 @@ function DashboardLayout({ children }) {
                     <Link to="/mapa-evolucao">Mapa de Evolução</Link>
                     <Link to="/prescricao">Prescrição</Link>
                     <Link to="/configuracoes" className="flex justify-center mt-5"><Settings size={20} /></Link>
-                    <button
-                        onClick={() => setMostrarNotificacoes(!mostrarNotificacoes)}
-                        className="flex justify-center mt-5"
-                    >
-                        <BellRing size={20} />
-                    </button>
-                    {mostrarNotificacoes && <NotificationDropdown />}
+
+                    <div className="flex justify-center mt-5">
+                        <NotificationBell />
+                    </div>
+
                 </nav>
                 <div className="flex justify-center mt-10">
                     <LogoutButton />

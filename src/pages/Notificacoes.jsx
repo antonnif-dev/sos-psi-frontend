@@ -6,8 +6,9 @@ export default function Notificacoes(){
 
   useEffect(()=>{
     async function load(){
-      const data = await getNotificacoes()
-      setNotificacoes(data)
+      const data = await getNotificacoes();
+      console.log("NOTIFICACOES RECEBIDAS:", data);
+      setNotificacoes(data);
     }
     load()
   },[])
