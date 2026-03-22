@@ -10,7 +10,7 @@ import Financeiro from "./pages/Financeiro";
 import Documentos from "./pages/Documentos";
 import Prontuario from "./pages/Prontuario";
 import MapaEvolucao from "./pages/MapaEvolucao";
-import Prescrição from "./pages/prescricao";
+import Prescrição from "./pages/Prescricao";
 import Configuracoes from "./pages/Configuracoes";
 import PacientePerfil from "./pages/PacientePerfil";
 import Notificacoes from "./pages/Notificacoes"
