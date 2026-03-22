@@ -1,4 +1,5 @@
 import { useAuth } from "../hooks/useAuth";
+import NotificationBell from "./NotificationBell"
 
 function Header(){
 
@@ -6,7 +7,7 @@ function Header(){
 
  return(
 
-  <header className="bg-white shadow p-4 flex justify-between">
+  <header className="bg-black shadow p-4 flex justify-between">
 
    <h1 className="font-bold">
     Painel

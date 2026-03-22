@@ -10,8 +10,10 @@ import Financeiro from "./pages/Financeiro";
 import Documentos from "./pages/Documentos";
 import Prontuario from "./pages/Prontuario";
 import MapaEvolucao from "./pages/MapaEvolucao";
+import Prescrição from "./pages/prescricao";
 import Configuracoes from "./pages/Configuracoes";
 import PacientePerfil from "./pages/PacientePerfil";
+import Notificacoes from "./pages/Notificacoes"
 
 function App() {
     return (
@@ -76,11 +78,25 @@ function App() {
                                 <MapaEvolucao />
                             </DashboardLayout>
                         </PrivateRoute>} />
+                <Route path="/prescricao"
+                    element={
+                        <PrivateRoute>
+                            <DashboardLayout>
+                                <Prescrição />
+                            </DashboardLayout>
+                        </PrivateRoute>} />
                 <Route path="/configuracoes"
                     element={
                         <PrivateRoute>
                             <DashboardLayout>
                                 <Configuracoes />
+                            </DashboardLayout>
+                        </PrivateRoute>} />
+                <Route path="/notificacoes"
+                    element={
+                        <PrivateRoute>
+                            <DashboardLayout>
+                                <Notificacoes />
                             </DashboardLayout>
                         </PrivateRoute>} />
                 <Route path="/pacientes/:id"

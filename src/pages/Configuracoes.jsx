@@ -3,276 +3,276 @@ import { useAuth } from "../hooks/useAuth";
 import { db } from "../services/firebase";
 
 import {
- collection,
- getDocs,
- doc,
- getDoc,
- updateDoc
+    collection,
+    getDocs,
+    doc,
+    getDoc,
+    updateDoc
 } from "firebase/firestore";
 
-export default function Configuracoes(){
+export default function Configuracoes() {
 
- const { user } = useAuth();
+    const { user } = useAuth();
 
- const [tenantId,setTenantId] = useState(null);
+    const [tenantId, setTenantId] = useState(null);
 
- const [form,setForm] = useState({
-  nome:"",
-  email:"",
-  plano:"",
-  status:""
- });
+    const [form, setForm] = useState({
+        nome: "",
+        email: "",
+        plano: "",
+        status: ""
+    });
 
- const [agenda,setAgenda] = useState({
-  sabado:false,
-  domingo:false
- });
+    const [agenda, setAgenda] = useState({
+        sabado: false,
+        domingo: false
+    });
 
- const [disponibilidade,setDisponibilidade] = useState({
-  segunda:{ativo:true,inicio:"08:00",fim:"18:00"},
-  terca:{ativo:true,inicio:"08:00",fim:"18:00"},
-  quarta:{ativo:true,inicio:"08:00",fim:"18:00"},
-  quinta:{ativo:true,inicio:"08:00",fim:"18:00"},
-  sexta:{ativo:true,inicio:"08:00",fim:"18:00"},
-  sabado:{ativo:false,inicio:"08:00",fim:"12:00"},
-  domingo:{ativo:false,inicio:"08:00",fim:"12:00"}
- });
+    const [disponibilidade, setDisponibilidade] = useState({
+        segunda: { ativo: true, inicio: "08:00", fim: "18:00" },
+        terca: { ativo: true, inicio: "08:00", fim: "18:00" },
+        quarta: { ativo: true, inicio: "08:00", fim: "18:00" },
+        quinta: { ativo: true, inicio: "08:00", fim: "18:00" },
+        sexta: { ativo: true, inicio: "08:00", fim: "18:00" },
+        sabado: { ativo: false, inicio: "08:00", fim: "12:00" },
+        domingo: { ativo: false, inicio: "08:00", fim: "12:00" }
+    });
 
- useEffect(()=>{
+    useEffect(() => {
 
-  async function carregarTenant(){
+        async function carregarTenant() {
 
-   if(!user) return;
+            if (!user) return;
 
-   const tenantsSnapshot = await getDocs(collection(db,"tenants"));
+            const tenantsSnapshot = await getDocs(collection(db, "tenants"));
 
-   for(const tenantDoc of tenantsSnapshot.docs){
+            for (const tenantDoc of tenantsSnapshot.docs) {
 
-    const userRef = doc(
-     db,
-     "tenants",
-     tenantDoc.id,
-     "usuarios",
-     user.uid
-    );
+                const userRef = doc(
+                    db,
+                    "tenants",
+                    tenantDoc.id,
+                    "usuarios",
+                    user.uid
+                );
 
-    const userSnap = await getDoc(userRef);
+                const userSnap = await getDoc(userRef);
 
-    if(userSnap.exists()){
+                if (userSnap.exists()) {
 
-     const data = tenantDoc.data();
+                    const data = tenantDoc.data();
 
-     setTenantId(tenantDoc.id);
+                    setTenantId(tenantDoc.id);
 
-     setForm({
-      nome:data.nome || "",
-      email:data.email || "",
-      plano:data.plano || "",
-      status:data.status || ""
-     });
+                    setForm({
+                        nome: data.nome || "",
+                        email: data.email || "",
+                        plano: data.plano || "",
+                        status: data.status || ""
+                    });
 
-     setAgenda({
-      sabado:data.agenda?.sabado || false,
-      domingo:data.agenda?.domingo || false
-     });
+                    setAgenda({
+                        sabado: data.agenda?.sabado || false,
+                        domingo: data.agenda?.domingo || false
+                    });
 
-     if(data.disponibilidade){
-      setDisponibilidade(data.disponibilidade);
-     }
+                    if (data.disponibilidade) {
+                        setDisponibilidade(data.disponibilidade);
+                    }
 
-     break;
+                    break;
+
+                }
+
+            }
+
+        }
+
+        carregarTenant();
+
+    }, [user]);
+
+    function handleChange(e) {
+
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
+        });
 
     }
 
-   }
+    function handleAgenda(e) {
 
-  }
+        setAgenda({
+            ...agenda,
+            [e.target.name]: e.target.checked
+        });
 
-  carregarTenant();
+    }
 
- },[user]);
+    function handleDisponibilidade(dia, campo, valor) {
 
- function handleChange(e){
+        setDisponibilidade({
+            ...disponibilidade,
+            [dia]: {
+                ...disponibilidade[dia],
+                [campo]: valor
+            }
+        });
 
-  setForm({
-   ...form,
-   [e.target.name]:e.target.value
-  });
+    }
 
- }
+    async function salvar() {
 
- function handleAgenda(e){
+        if (!tenantId) return;
 
-  setAgenda({
-   ...agenda,
-   [e.target.name]:e.target.checked
-  });
+        const ref = doc(db, "tenants", tenantId);
 
- }
+        await updateDoc(ref, {
+            nome: form.nome,
+            email: form.email,
+            plano: form.plano,
+            status: form.status,
+            agenda,
+            disponibilidade
+        });
 
- function handleDisponibilidade(dia,campo,valor){
+        alert("Configurações atualizadas!");
 
-  setDisponibilidade({
-   ...disponibilidade,
-   [dia]:{
-    ...disponibilidade[dia],
-    [campo]:valor
-   }
-  });
+    }
 
- }
+    const dias = [
+        "segunda",
+        "terca",
+        "quarta",
+        "quinta",
+        "sexta",
+        "sabado",
+        "domingo"
+    ];
 
- async function salvar(){
+    return (
 
-  if(!tenantId) return;
+        <div className="space-y-8">
 
-  const ref = doc(db,"tenants",tenantId);
+            <h1 className="text-2xl font-bold">
+                Configurações da Clínica
+            </h1>
 
-  await updateDoc(ref,{
-   nome:form.nome,
-   email:form.email,
-   plano:form.plano,
-   status:form.status,
-   agenda,
-   disponibilidade
-  });
+            <div className="bg-white p-6 rounded shadow flex flex-col gap-4 max-w-md">
 
-  alert("Configurações atualizadas!");
+                <h2 className="font-semibold text-lg">
+                    Informações da Clínica
+                </h2>
 
- }
+                <input
+                    name="nome"
+                    value={form.nome}
+                    onChange={handleChange}
+                    placeholder="Nome da clínica"
+                    className="border p-2 rounded"
+                />
 
- const dias = [
-  "segunda",
-  "terca",
-  "quarta",
-  "quinta",
-  "sexta",
-  "sabado",
-  "domingo"
- ];
+                <input
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="Email"
+                    className="border p-2 rounded"
+                />
 
- return(
+            </div>
 
- <div className="space-y-8">
+            <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
 
-  <h1 className="text-2xl font-bold">
-   Configurações da Clínica
-  </h1>
+                <h2 className="font-semibold text-lg">
+                    Configurações da Agenda
+                </h2>
 
-  <div className="bg-white p-6 rounded shadow flex flex-col gap-4 max-w-md">
+                <label className="flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        name="sabado"
+                        checked={agenda.sabado}
+                        onChange={handleAgenda}
+                    />
+                    Atender aos sábados
+                </label>
 
-   <h2 className="font-semibold text-lg">
-    Informações da Clínica
-   </h2>
+                <label className="flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        name="domingo"
+                        checked={agenda.domingo}
+                        onChange={handleAgenda}
+                    />
+                    Atender aos domingos
+                </label>
 
-   <input
-    name="nome"
-    value={form.nome}
-    onChange={handleChange}
-    placeholder="Nome da clínica"
-    className="border p-2 rounded"
-   />
+            </div>
 
-   <input
-    name="email"
-    value={form.email}
-    onChange={handleChange}
-    placeholder="Email"
-    className="border p-2 rounded"
-   />
+            <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
 
-  </div>
+                <h2 className="font-semibold text-lg">
+                    Disponibilidade semanal
+                </h2>
 
-  <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
+                {dias.map(dia => {
 
-   <h2 className="font-semibold text-lg">
-    Configurações da Agenda
-   </h2>
+                    const dados = disponibilidade[dia];
 
-   <label className="flex items-center gap-2">
-    <input
-     type="checkbox"
-     name="sabado"
-     checked={agenda.sabado}
-     onChange={handleAgenda}
-    />
-    Atender aos sábados
-   </label>
+                    return (
 
-   <label className="flex items-center gap-2">
-    <input
-     type="checkbox"
-     name="domingo"
-     checked={agenda.domingo}
-     onChange={handleAgenda}
-    />
-    Atender aos domingos
-   </label>
+                        <div
+                            key={dia}
+                            className="flex items-center gap-3 flex-wrap"
+                        >
 
-  </div>
+                            <input
+                                type="checkbox"
+                                checked={dados.ativo}
+                                onChange={(e) => handleDisponibilidade(dia, "ativo", e.target.checked)}
+                            />
 
-  <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
+                            <span className="w-24 capitalize">
+                                {dia}
+                            </span>
 
-   <h2 className="font-semibold text-lg">
-    Disponibilidade semanal
-   </h2>
+                            <input
+                                type="time"
+                                value={dados.inicio}
+                                disabled={!dados.ativo}
+                                onChange={(e) => handleDisponibilidade(dia, "inicio", e.target.value)}
+                                className="border p-1 rounded"
+                            />
 
-   {dias.map(dia=>{
+                            <span>até</span>
 
-    const dados = disponibilidade[dia];
+                            <input
+                                type="time"
+                                value={dados.fim}
+                                disabled={!dados.ativo}
+                                onChange={(e) => handleDisponibilidade(dia, "fim", e.target.value)}
+                                className="border p-1 rounded"
+                            />
 
-    return(
+                        </div>
 
-     <div
-      key={dia}
-      className="flex items-center gap-3 flex-wrap"
-     >
+                    )
 
-      <input
-       type="checkbox"
-       checked={dados.ativo}
-       onChange={(e)=>handleDisponibilidade(dia,"ativo",e.target.checked)}
-      />
+                })}
 
-      <span className="w-24 capitalize">
-       {dia}
-      </span>
+            </div>
 
-      <input
-       type="time"
-       value={dados.inicio}
-       disabled={!dados.ativo}
-       onChange={(e)=>handleDisponibilidade(dia,"inicio",e.target.value)}
-       className="border p-1 rounded"
-      />
+            <button
+                onClick={salvar}
+                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            >
+                Salvar Configurações
+            </button>
 
-      <span>até</span>
+        </div>
 
-      <input
-       type="time"
-       value={dados.fim}
-       disabled={!dados.ativo}
-       onChange={(e)=>handleDisponibilidade(dia,"fim",e.target.value)}
-       className="border p-1 rounded"
-      />
-
-     </div>
-
-    )
-
-   })}
-
-  </div>
-
-  <button
-   onClick={salvar}
-   className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-  >
-   Salvar Configurações
-  </button>
-
- </div>
-
- );
+    );
 
 }
