@@ -29,7 +29,7 @@ export default function NotificationDropdown({ open, onClose }) {
   }
 
   return (
-    <div className="absolute left-full ml-2 top-12 w-80 bg-white shadow-lg rounded-lg z-50 text-black">
+    <div className="absolute right-0 top-12 w-80 bg-white shadow-lg rounded-lg z-50 text-black">
       {notificacoes.length === 0 && (
         <div className="p-4 text-sm text-gray-500">
           Nenhuma notificação

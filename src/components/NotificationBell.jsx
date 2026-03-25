@@ -4,8 +4,9 @@ import { getUnreadCount } from "../services/notificacoesService"
 import NotificationDropdown from "./NotificationDropdown"
 
 export default function NotificationBell() {
-  const [open, setOpen] = useState(false)
-  const [count, setCount] = useState(0)
+  const [open, setOpen] = useState(false);
+  const [count, setCount] = useState(0);
+  
   async function loadCount() {
     const c = await getUnreadCount()
     setCount(c)

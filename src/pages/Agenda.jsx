@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { listarPacientes } from "../services/pacientesService";
-import { listarConsultas, criarConsulta, deletarConsulta } from "../services/agendaService";
+import { listarConsultas, criarConsulta, deletarConsulta, editarConsulta } from "../services/agendaService";
 import Card from "../components/Card";
 import { db } from "../services/firebase";
 import { doc, getDoc, getDocs, collection } from "firebase/firestore";
@@ -21,18 +21,47 @@ function Agenda() {
     const [modalNovo, setModalNovo] = useState(null);
     const [buscaPaciente, setBuscaPaciente] = useState("");
     const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
+
     const horarios = [
         "08:00", "09:00", "10:00", "11:00",
         "12:00", "13:00", "14:00", "15:00",
         "16:00", "17:00", "18:00"
     ];
+
+    const coresStatus = {
+        agendada: "bg-indigo-100",
+        realizada: "bg-green-100",
+        cancelada: "bg-red-100",
+        faltou: "bg-yellow-100"
+    };
     const [diaMobileIndex, setDiaMobileIndex] = useState(0);
 
     async function carregar() {
         const dados = await listarConsultas();
+        console.log("CONSULTAS:", dados);
+        console.log("PRIMEIRA CONSULTA:", dados[0]);
+        console.log("TIPO DATA:", typeof dados[0]?.data);
         setConsultas(dados);
         const pacientesLista = await listarPacientes();
         setPacientes(pacientesLista);
+    }
+
+    function normalizarData(data) {
+
+        if (!data) return null;
+
+        // se já for string
+        if (typeof data === "string") {
+            return new Date(data);
+        }
+
+        // se for timestamp do firestore
+        if (data.seconds) {
+            return new Date(data.seconds * 1000);
+        }
+
+        // fallback
+        return new Date(data);
     }
 
     useEffect(() => {
@@ -120,11 +149,14 @@ function Agenda() {
 
     function consultaNoSlot(data, horario) {
         return consultas.find(c => {
-            const d = new Date(c.data);
+            const d = normalizarData(c.data);
+            console.log("Consulta:", d, "Slot:", horario, "Dia:", data);
+            if (!d) return false;
             const h =
                 d.getHours().toString().padStart(2, "0") +
                 ":" +
                 d.getMinutes().toString().padStart(2, "0");
+
             return (
                 d.toDateString() === data.toDateString()
                 &&
@@ -151,6 +183,8 @@ function Agenda() {
         const data = new Date(modalNovo.data);
         data.setHours(Number(h));
         data.setMinutes(Number(m));
+        data.setSeconds(0);
+        data.setMilliseconds(0);
         const horarioExiste = consultaNoSlot(modalNovo.data, modalNovo.horario);
         if (horarioExiste) {
             alert("Já existe uma consulta nesse horário.");
@@ -158,7 +192,9 @@ function Agenda() {
         }
         await criarConsulta({
             pacienteId: pacienteSelecionado.id,
-            data: data.toISOString()
+            pacienteNome: pacienteSelecionado.nome,
+            data: data.toISOString(),
+            status: "agendada"
         });
         setModalNovo(null);
         setPacienteSelecionado(null);
@@ -176,6 +212,22 @@ function Agenda() {
 
         carregar();
 
+    }
+
+    async function finalizarConsulta(id) {
+        await editarConsulta(id, {
+            status: "realizada"
+        });
+        setModalConsulta(null);
+        carregar();
+    }
+
+    async function marcarFalta(id) {
+        await editarConsulta(id, {
+            status: "faltou"
+        });
+        setModalConsulta(null);
+        carregar();
     }
 
     const sugestoes = pacientes.filter(p =>
@@ -328,7 +380,7 @@ function Agenda() {
                                             }}
                                         >
                                             {consulta && (
-                                                <div className="bg-indigo-100 rounded p-5">
+                                                <div className={`${coresStatus[consulta.status] || "bg-indigo-100"} rounded p-5`}>
                                                     {nomePaciente(consulta.pacienteId)}
                                                 </div>
                                             )}
@@ -410,13 +462,28 @@ function Agenda() {
                         <div className="text-sm">
                             Paciente: {nomePaciente(modalConsulta.pacienteId)}
                         </div>
-                        <div className="flex gap-2 justify-end">
+                        <div className="flex gap-2 justify-end flex-wrap">
                             <button
                                 onClick={() => setModalConsulta(null)}
                                 className="px-3 py-1 bg-gray-200 rounded"
                             >
                                 Fechar
                             </button>
+
+                            <button
+                                onClick={() => finalizarConsulta(modalConsulta.id)}
+                                className="px-3 py-1 bg-green-600 text-white rounded"
+                            >
+                                Finalizar sessão
+                            </button>
+
+                            <button
+                                onClick={() => marcarFalta(modalConsulta.id)}
+                                className="px-3 py-1 bg-yellow-500 text-white rounded"
+                            >
+                                Paciente faltou
+                            </button>
+
                             <button
                                 onClick={() => {
                                     setModalConsulta(null);
@@ -431,6 +498,7 @@ function Agenda() {
                             >
                                 Reagendar
                             </button>
+
                             <button
                                 onClick={() => cancelarConsulta(modalConsulta.id)}
                                 className="px-3 py-1 bg-red-500 text-white rounded"

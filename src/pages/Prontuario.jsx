@@ -194,24 +194,6 @@ function Prontuario() {
                         {prontuarios.length}
                     </p>
                 </div>
-
-                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                    <p className="text-sm text-gray-500">
-                        Último paciente
-                    </p>
-                    <p className="text-lg font-medium text-gray-800 mt-2">
-                        {prontuarios.length > 0 ? prontuarios[prontuarios.length - 1].paciente : "—"}
-                    </p>
-                </div>
-
-                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                    <p className="text-sm text-gray-500">
-                        Status do prontuário
-                    </p>
-                    <p className="text-lg font-medium text-green-600 mt-2">
-                        Sistema ativo
-                    </p>
-                </div>
             </div>
 
             <div>

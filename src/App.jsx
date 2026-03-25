@@ -13,7 +13,8 @@ import MapaEvolucao from "./pages/MapaEvolucao";
 import Prescrição from "./pages/Prescricao";
 import Configuracoes from "./pages/Configuracoes";
 import PacientePerfil from "./pages/PacientePerfil";
-import Notificacoes from "./pages/Notificacoes"
+import Notificacoes from "./pages/Notificacoes";
+import SessoesRealizadas from "./pages/SessoesRealizadas";
 
 function App() {
     return (
@@ -47,7 +48,13 @@ function App() {
                                 <Agenda />
                             </DashboardLayout>
                         </PrivateRoute>} />
-
+                <Route path="/sessoes"
+                    element={
+                        <PrivateRoute>
+                            <DashboardLayout>
+                                <SessoesRealizadas />
+                            </DashboardLayout>
+                        </PrivateRoute>} />
                 <Route path="/financeiro"
                     element={
                         <PrivateRoute>
