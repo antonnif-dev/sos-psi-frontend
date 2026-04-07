@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import LogoutButton from "../components/LogoutButton";
 import { useEffect, useState } from "react";
-import { PanelLeftClose, PanelLeftOpen, Settings } from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen, Settings, UserPen } from "lucide-react";
 import { buscarTenant } from "../services/tenantService";
 import { auth, db } from "../services/firebase";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import NotificationBell from "../components/NotificationBell"
+import NotificationBell from "../components/NotificationBell";
 
 function DashboardLayout({ children }) {
     const [menuAberto, setMenuAberto] = useState(true);
@@ -70,6 +70,7 @@ function DashboardLayout({ children }) {
                     <Link to="/prontuario">Prontuário</Link>
                     <Link to="/mapa-evolucao">Mapa de Evolução</Link>
                     <Link to="/prescricao">Prescrição</Link>
+                    <Link to="/meu-perfil"><UserPen size={20} /></Link>
                     <Link to="/configuracoes" className="flex justify-center mt-5"><Settings size={20} /></Link>
                 </nav>
             </aside>
@@ -81,7 +82,6 @@ function DashboardLayout({ children }) {
                 {menuAberto ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
             </button>
             <div className="flex flex-col flex-1">
-
                 {/* TOPBAR */}
                 <div className="h-16 bg-white border-b shadow-sm grid grid-cols-3 items-center px-6">
 

@@ -186,34 +186,6 @@ export default function Configuracoes() {
             <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
 
                 <h2 className="font-semibold text-lg">
-                    Configurações da Agenda
-                </h2>
-
-                <label className="flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        name="sabado"
-                        checked={agenda.sabado}
-                        onChange={handleAgenda}
-                    />
-                    Atender aos sábados
-                </label>
-
-                <label className="flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        name="domingo"
-                        checked={agenda.domingo}
-                        onChange={handleAgenda}
-                    />
-                    Atender aos domingos
-                </label>
-
-            </div>
-
-            <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
-
-                <h2 className="font-semibold text-lg">
                     Disponibilidade semanal
                 </h2>
 

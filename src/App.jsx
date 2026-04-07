@@ -15,6 +15,7 @@ import Configuracoes from "./pages/Configuracoes";
 import PacientePerfil from "./pages/PacientePerfil";
 import Notificacoes from "./pages/Notificacoes";
 import SessoesRealizadas from "./pages/SessoesRealizadas";
+import MeuPerfil from "./pages/MeuPerfil";
 
 function App() {
     return (
@@ -97,6 +98,13 @@ function App() {
                         <PrivateRoute>
                             <DashboardLayout>
                                 <Configuracoes />
+                            </DashboardLayout>
+                        </PrivateRoute>} />
+                <Route path="/meu-perfil"
+                    element={
+                        <PrivateRoute>
+                            <DashboardLayout>
+                                <MeuPerfil />
                             </DashboardLayout>
                         </PrivateRoute>} />
                 <Route path="/notificacoes"

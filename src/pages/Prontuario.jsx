@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { listarProntuarios, criarProntuario, editarProntuario, deletarProntuario } from "../services/prontuarioService";
-import { listarPacientes } from "../services/pacientesService";
+import { listarSessoesRealizadas } from "../services/agendaService";
 import Card from "../components/Card";
 
 function CampoNumero({ label, value, setter }) {
@@ -18,13 +18,13 @@ function CampoNumero({ label, value, setter }) {
 }
 
 function Prontuario() {
-
     const [prontuarios, setProntuarios] = useState([]);
     const [paciente, setPaciente] = useState("");
     const [observacoes, setObservacoes] = useState("");
     const [editando, setEditando] = useState(null);
 
-    const [pacientes, setPacientes] = useState([]);
+    const [sessoes, setSessoes] = useState([]);
+    const [sessaoSelecionada, setSessaoSelecionada] = useState(null);
     const [sugestoes, setSugestoes] = useState([]);
 
     const [humor, setHumor] = useState("");
@@ -50,28 +50,35 @@ function Prontuario() {
         setProntuarios(dados);
     }
 
-    async function carregarPacientes() {
-        const dados = await listarPacientes();
-        setPacientes(dados);
+    async function carregarSessoes() {
+        const dados = await listarSessoesRealizadas();
+        setSessoes(dados);
     }
 
     useEffect(() => {
         carregar();
-        carregarPacientes();
+        carregarSessoes();
     }, []);
 
     function buscarPaciente(texto) {
         setPaciente(texto);
-
         if (!texto) {
             setSugestoes([]);
             return;
         }
 
-        const filtrados = pacientes.filter(p =>
-            p.nome.toLowerCase().startsWith(texto.toLowerCase())
-        );
+        const sessoesUsadas = prontuarios.map(p => p.agendaId);
 
+        const filtrados = sessoes.filter(s => {
+            const nomeMatch =
+                s.pacienteNome?.toLowerCase().startsWith(texto.toLowerCase());
+
+            const jaUsada =
+                sessoesUsadas.includes(s.id);
+
+            return nomeMatch && !jaUsada;
+
+        });
         setSugestoes(filtrados.slice(0, 5));
     }
 
@@ -79,6 +86,8 @@ function Prontuario() {
         e.preventDefault();
         const data = {
             paciente,
+            pacienteId: sessaoSelecionada?.pacienteId,
+            agendaId: sessaoSelecionada?.id,
             observacoes,
 
             humor,
@@ -99,7 +108,7 @@ function Prontuario() {
             interacaoSocial,
             motivacao,
 
-            dataSessao: new Date()
+            dataSessao: sessaoSelecionada?.data
         };
 
         if (editando) {
@@ -218,16 +227,17 @@ function Prontuario() {
 
                         {sugestoes.length > 0 && (
                             <div className="absolute bg-white border w-full mt-1 rounded shadow">
-                                {sugestoes.map(p => (
+                                {sugestoes.map(s => (
                                     <div
-                                        key={p.id}
+                                        key={s.id}
                                         onClick={() => {
-                                            setPaciente(p.nome);
+                                            setPaciente(s.pacienteNome);
+                                            setSessaoSelecionada(s);
                                             setSugestoes([]);
                                         }}
                                         className="px-3 py-2 cursor-pointer hover:bg-gray-100"
                                     >
-                                        {p.nome}
+                                        {s.pacienteNome} — {new Date(s.data).toLocaleString("pt-BR")}
                                     </div>
                                 ))}
                             </div>
@@ -311,6 +321,15 @@ function Prontuario() {
                             </p>
                             <p className="font-medium text-gray-800 mb-3">
                                 {p.paciente}
+                            </p>
+                            <p className="text-sm text-gray-500 mb-1">
+                                Data da sessão
+                            </p>
+
+                            <p className="text-sm text-gray-700 mb-3">
+                                {p.dataSessao
+                                    ? new Date(p.dataSessao).toLocaleString("pt-BR")
+                                    : "Data não registrada"}
                             </p>
                             <p className="text-sm text-gray-500 mb-1">
                                 Observações
