@@ -1,25 +1,66 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { listarPacientes } from "../services/pacientesService";
+import { listarObservacoes, criarObservacao, listarPacientes } from "../services/pacientesService";
 import Card from "../components/Card";
+import { auth } from "../services/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 function PacientePerfil() {
     const { id } = useParams();
+    const [user, setUser] = useState(null);
     const [paciente, setPaciente] = useState(null);
+    const [observacoes, setObservacoes] = useState([]);
+    const [novaObs, setNovaObs] = useState("");
 
+    const tenantId = user?.tenantId || "tenant1"; // fallback
+
+    // observar autenticação
     useEffect(() => {
-        async function carregar() {
-            const data = await listarPacientes();
-            const p = data.find(p => p.id === id);
-            setPaciente(p || {});
+        const unsubscribe = onAuthStateChanged(auth, (u) => {
+            if (u) {
+                setUser({
+                    uid: u.uid,
+                    email: u.email,
+                    tenantId: "tenant1" // ou buscar do Firestore se cada usuário tiver tenant
+                });
+            } else {
+                setUser(null);
+            }
+        });
+        return () => unsubscribe();
+    }, []);
+
+    // carregar paciente quando user estiver definido
+    useEffect(() => {
+        if (!user) return;
+
+        async function carregarPaciente() {
+            try {
+                const data = await listarPacientes(tenantId);
+                const p = data.find(p => p.id === id);
+                setPaciente(p || {});
+                const obs = await listarObservacoes(tenantId, id);
+                setObservacoes(obs);
+            } catch (err) {
+                console.error("ERRO:", err);
+            }
         }
-        carregar();
-    }, [id]);
 
-    if (!paciente) return <p>Carregando...</p>;
+        carregarPaciente();
+    }, [user, id, tenantId]);
 
-    // fallback seguro para endereço
+    if (!user) return <p>Carregando usuário...</p>;
+    if (!paciente) return <p>Carregando paciente...</p>;
+
     const endereco = paciente.endereco || {};
+
+    async function salvarObservacao() {
+        if (!novaObs.trim()) return;
+        await criarObservacao(tenantId, id, novaObs);
+        const obs = await listarObservacoes(tenantId, id);
+        setObservacoes(obs);
+        setNovaObs("");
+    }
 
     return (
         <div className="space-y-6">
@@ -36,7 +77,7 @@ function PacientePerfil() {
                     <div>
                         <p><b>Profissão:</b> {paciente.profissao || "-"}</p>
                         <p><b>Status:</b> {paciente.status || "-"}</p>
-                        
+
                     </div>
                 </div>
             </Card>
@@ -58,17 +99,48 @@ function PacientePerfil() {
                 <h2 className="font-semibold mb-2">Status do Paciente</h2>
                 <p><b>Valor da Sessão:</b> {paciente.valorSessao || "-"}</p>
                 <p><b>Status:</b> {paciente.status || "-"}</p>
+                <p><b>Frequência:</b> {paciente.frequencia || "-"}</p>
             </Card>
 
             <Card>
-                <h2 className="font-semibold mb-2">Observações</h2>
+                <h2 className="font-semibold mb-2">Observações Iniciais</h2>
                 <p className="text-sm text-gray-600">
-                    {paciente.observacoes || "Sem observações"}
+                    {paciente.observacoesIniciais || "Sem observações iniciais"}
                 </p>
             </Card>
-                <h2>Espaço para adcionar novas observações</h2>
-            <Card>
 
+            <h2>Espaço para adcionar novas observações</h2>
+            <Card>
+                <h2 className="font-semibold mb-3">Observações Clínicas</h2>
+
+                {observacoes.length > 0 ? (
+                    <div className="space-y-3">
+                        {observacoes.map(obs => (
+                            <div key={obs.id} className="border p-3 rounded bg-gray-50">
+                                <p className="text-xs text-gray-500">{obs.data}</p>
+                                <p className="text-sm">{obs.texto}</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-sm text-gray-500">Nenhuma observação registrada.</p>
+                )}
+
+                <div className="mt-4">
+                    <textarea
+                        value={novaObs}
+                        onChange={(e) => setNovaObs(e.target.value)}
+                        className="w-full border rounded p-2 text-sm"
+                        placeholder="Adicionar nova observação..."
+                    />
+
+                    <button
+                        onClick={salvarObservacao}
+                        className="mt-2 bg-blue-600 text-white px-4 py-2 rounded text-sm"
+                    >
+                        Salvar Observação
+                    </button>
+                </div>
             </Card>
         </div>
     );

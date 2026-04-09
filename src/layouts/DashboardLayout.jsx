@@ -7,6 +7,7 @@ import { auth, db } from "../services/firebase";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import NotificationBell from "../components/NotificationBell";
+import MuralGlobal from "../components/MuralGlobal";
 
 function DashboardLayout({ children }) {
     const [menuAberto, setMenuAberto] = useState(true);
@@ -64,7 +65,7 @@ function DashboardLayout({ children }) {
                     <Link to="/dashboard">Dashboard</Link>
                     <Link to="/pacientes">Pacientes</Link>
                     <Link to="/agenda">Agenda</Link>
-                    <Link to="/sessoes">Sessões realizadas</Link>
+                    <Link to="/sessoes">Sessões</Link>
                     <Link to="/financeiro">Financeiro</Link>
                     <Link to="/documentos">Documentos</Link>
                     <Link to="/prontuario">Prontuário</Link>
@@ -83,7 +84,7 @@ function DashboardLayout({ children }) {
             </button>
             <div className="flex flex-col flex-1">
                 {/* TOPBAR */}
-                <div className="h-16 bg-white border-b shadow-sm grid grid-cols-3 items-center px-6">
+                <div className="h-20 bg-white border-b shadow-sm grid grid-cols-3 items-center px-6">
 
                     {/* ESQUERDA */}
                     <div className="font-semibold">
@@ -96,7 +97,7 @@ function DashboardLayout({ children }) {
                     </div>
 
                     {/* DIREITA */}
-                    <div className="flex justify-end items-center gap-4">
+                    <div className="flex justify-end items-center gap-2">
                         <NotificationBell />
                         <div className="w-px h-6 bg-gray-300"></div>
                         <LogoutButton />
@@ -105,9 +106,12 @@ function DashboardLayout({ children }) {
                 </div>
 
                 {/* CONTEÚDO */}
-                <main className="flex-1 bg-gray-100 p-8 overflow-y-auto">
+                <main className="flex-1 bg-gray-100 p-8 overflow-y-auto pb-[20vh]">
                     {children}
                 </main>
+
+                {/* MURAL GLOBAL */}
+                <MuralGlobal tenantNome={tenantNome} />
 
             </div>
         </div>

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { listarProntuarios } from "../services/prontuarioService";
 import { listarPacientes } from "../services/pacientesService";
+import { useAuth } from "../context/AuthContext";
+import { useTenant } from "../context/TenantContext";
 
 import {
   ResponsiveContainer,
@@ -25,19 +27,21 @@ export default function MapaEvolucao() {
   const [pacienteSelecionado, setPacienteSelecionado] = useState("");
   const [dados, setDados] = useState([]);
   const [sintomaSelecionado, setSintomaSelecionado] = useState("humor");
+  const { user } = useAuth();
+  const { tenantId } = useTenant();
 
   useEffect(() => {
+    async function carregarPacientes() {
+      if (!tenantId || !user) return;
+      const res = await listarPacientes(tenantId, user.uid);
+      setPacientes(res);
+    }
     carregarPacientes();
-  }, []);
-
-  async function carregarPacientes() {
-    const res = await listarPacientes();
-    setPacientes(res);
-  }
+  }, [tenantId, user]);
 
   async function carregarDados(pacienteNome) {
 
-    const prontuarios = await listarProntuarios();
+    const prontuarios = await listarProntuarios(tenantId);
 
     const filtrado = prontuarios
       .filter((p) => p.paciente === pacienteNome)

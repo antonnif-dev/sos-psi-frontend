@@ -38,9 +38,6 @@ function Agenda() {
 
     async function carregar() {
         const dados = await listarConsultas();
-        console.log("CONSULTAS:", dados);
-        console.log("PRIMEIRA CONSULTA:", dados[0]);
-        console.log("TIPO DATA:", typeof dados[0]?.data);
         setConsultas(dados);
         const pacientesLista = await listarPacientes();
         setPacientes(pacientesLista);
@@ -150,7 +147,6 @@ function Agenda() {
     function consultaNoSlot(data, horario) {
         return consultas.find(c => {
             const d = normalizarData(c.data);
-            console.log("Consulta:", d, "Slot:", horario, "Dia:", data);
             if (!d) return false;
             const h =
                 d.getHours().toString().padStart(2, "0") +

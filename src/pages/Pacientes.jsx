@@ -7,15 +7,20 @@ import {
 } from "../services/pacientesService";
 import Card from "../components/Card";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../services/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 function Pacientes() {
 
     const [pacientes, setPacientes] = useState([]);
     const [busca, setBusca] = useState("");
     const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+    const tenantId = user?.tenantId || "tenant1";
 
     const [novoPaciente, setNovoPaciente] = useState({
         nome: "",
+        ddd: "",
         telefone: "",
         email: "",
         dataNascimento: "",
@@ -23,7 +28,8 @@ function Pacientes() {
         cpf: "",
         valorSessao: "",
         status: "ativo",
-        observacoes: "",
+        frequencia: "",
+        observacoesIniciais: "",
 
         endereco: {
             cep: "",
@@ -40,26 +46,47 @@ function Pacientes() {
     const [pacienteEditado, setPacienteEditado] = useState({});
 
     async function carregarPacientes() {
-        const data = await listarPacientes();
+        if (!user) return;
+        const data = await listarPacientes(tenantId, user.uid);
         setPacientes(data);
     }
 
     useEffect(() => {
-        carregarPacientes();
+        const unsubscribe = onAuthStateChanged(auth, (u) => {
+            if (u) {
+                setUser({
+                    uid: u.uid,
+                    email: u.email,
+                    tenantId: "tenant1"
+                });
+            } else {
+                setUser(null);
+                setPacientes([]);
+            }
+        });
+
+        return () => unsubscribe();
     }, []);
+
+    useEffect(() => {
+        carregarPacientes();
+    }, [user]);
 
     const pacientesFiltrados = pacientes.filter(p =>
         p.nome?.toLowerCase().includes(busca.toLowerCase())
     );
 
     async function handleCriar() {
-
         if (!novoPaciente.nome) return;
-
-        await criarPaciente(novoPaciente);
+        const telefoneFormatado = `55${novoPaciente.ddd}${novoPaciente.telefone}`;
+        await criarPaciente(user.tenantId, {
+            ...novoPaciente,
+            telefone: telefoneFormatado
+        });
 
         setNovoPaciente({
             nome: "",
+            ddd: "",
             telefone: "",
             email: "",
             dataNascimento: "",
@@ -67,7 +94,8 @@ function Pacientes() {
             cpf: "",
             valorSessao: "",
             status: "ativo",
-            observacoes: "",
+            frequencia: "",
+            observacoesIniciais: "",
 
             endereco: {
                 cep: "",
@@ -85,7 +113,7 @@ function Pacientes() {
 
     async function handleEditar(id) {
 
-        await editarPaciente(id, pacienteEditado);
+        await editarPaciente(user.tenantId, id, pacienteEditado);
 
         setEditandoId(null);
         setPacienteEditado({});
@@ -97,7 +125,7 @@ function Pacientes() {
 
         if (!confirm("Deseja excluir este paciente?")) return;
 
-        await deletarPaciente(id);
+        await deletarPaciente(user.tenantId, id);
 
         carregarPacientes();
     }
@@ -127,7 +155,7 @@ function Pacientes() {
 
             {/* LISTA */}
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
 
                 {pacientesFiltrados.map(p => (
 
@@ -148,6 +176,13 @@ function Pacientes() {
                                     placeholder="Nome"
                                     value={pacienteEditado.nome || ""}
                                     onChange={(e) => setPacienteEditado({ ...pacienteEditado, nome: e.target.value })}
+                                    className="border rounded px-2 py-1 text-sm w-full"
+                                />
+
+                                <input
+                                    placeholder="DDD"
+                                    value={pacienteEditado.ddd || ""}
+                                    onChange={(e) => setPacienteEditado({ ...pacienteEditado, ddd: e.target.value })}
                                     className="border rounded px-2 py-1 text-sm w-full"
                                 />
 
@@ -217,6 +252,13 @@ function Pacientes() {
                                     <option value="pausa">Em pausa</option>
                                     <option value="encerrado">Encerrado</option>
                                 </select>
+
+                                <input
+                                    placeholder="Frequência"
+                                    value={pacienteEditado.frequencia || ""}
+                                    onChange={(e) => setPacienteEditado({ ...pacienteEditado, frequencia: e.target.value })}
+                                    className="border rounded px-2 py-1 text-sm w-full"
+                                />
 
                                 <textarea
                                     placeholder="Observações"
@@ -331,16 +373,24 @@ function Pacientes() {
                         className="border rounded px-3 py-2 text-sm"
                     />
                     <input
-                        placeholder="Telefone"
-                        value={novoPaciente.telefone}
-                        onChange={(e) => setNovoPaciente({ ...novoPaciente, telefone: e.target.value })}
-                        className="border rounded px-3 py-2 text-sm"
-                    />
-                    <input
                         placeholder="Email"
                         value={novoPaciente.email}
                         onChange={(e) => setNovoPaciente({ ...novoPaciente, email: e.target.value })}
                         className="border rounded px-3 py-2 text-sm"
+                    />
+                    <input
+                        placeholder="DDD"
+                        value={novoPaciente.ddd}
+                        onChange={(e) => setNovoPaciente({ ...novoPaciente, ddd: e.target.value })}
+                        className="border rounded px-3 py-2 text-sm w-20"
+                        maxLength={2}
+                    />
+                    <input
+                        placeholder="Telefone"
+                        value={novoPaciente.telefone}
+                        onChange={(e) => setNovoPaciente({ ...novoPaciente, telefone: e.target.value })}
+                        className="border rounded px-3 py-2 text-sm"
+                        maxLength={9}
                     />
                     <input
                         type="date"
@@ -462,10 +512,24 @@ function Pacientes() {
                     <option value="encerrado">Encerrado</option>
                 </select>
 
+                <div className="flex items-center gap-2 mt-3">
+                    <input
+                        type="number"
+                        min="1"
+                        placeholder="Frequência"
+                        value={novoPaciente.frequencia}
+                        onChange={(e) =>
+                            setNovoPaciente({ ...novoPaciente, frequencia: e.target.value })
+                        }
+                        className="border rounded px-3 py-2 text-sm w-24"
+                    />
+                    <span className="text-sm">dias</span>
+                </div>
+
                 <textarea
-                    placeholder="Observações"
-                    value={novoPaciente.observacoes}
-                    onChange={(e) => setNovoPaciente({ ...novoPaciente, observacoes: e.target.value })}
+                    placeholder="Observações Iniciais"
+                    value={novoPaciente.observacoesIniciais}
+                    onChange={(e) => setNovoPaciente({ ...novoPaciente, observacoesIniciais: e.target.value })}
                     className="border rounded px-3 py-2 text-sm w-full mt-3"
                 />
 
