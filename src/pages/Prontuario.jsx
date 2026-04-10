@@ -3,7 +3,7 @@ import { listarProntuarios, criarProntuario, editarProntuario, deletarProntuario
 import { listarSessoesRealizadas } from "../services/agendaService";
 import Card from "../components/Card";
 
-function CampoNumero({ label, value, setter }) {
+function CampoNumero({ label, value, setter, disabled }) {
     return (
         <input
             type="number"
@@ -11,8 +11,9 @@ function CampoNumero({ label, value, setter }) {
             max="10"
             placeholder={label}
             value={value}
+            disabled={disabled}
             onChange={(e) => setter(Number(e.target.value))}
-            className="border rounded p-2"
+            className={`border rounded p-2 ${disabled ? "bg-gray-100 text-gray-500" : ""}`}
         />
     );
 }
@@ -22,6 +23,7 @@ function Prontuario() {
     const [paciente, setPaciente] = useState("");
     const [observacoes, setObservacoes] = useState("");
     const [editando, setEditando] = useState(null);
+    const [visualizando, setVisualizando] = useState(false);
 
     const [sessoes, setSessoes] = useState([]);
     const [sessaoSelecionada, setSessaoSelecionada] = useState(null);
@@ -44,6 +46,7 @@ function Prontuario() {
     const [produtividade, setProdutividade] = useState("");
     const [interacaoSocial, setInteracaoSocial] = useState("");
     const [motivacao, setMotivacao] = useState("");
+
 
     async function carregar() {
         const dados = await listarProntuarios();
@@ -144,9 +147,10 @@ function Prontuario() {
         setMotivacao("");
 
         setEditando(null);
+        setVisualizando(false);
     }
 
-    function iniciarEdicao(p) {
+    function visualizarProntuario(p) {
         setPaciente(p.paciente);
         setObservacoes(p.observacoes);
 
@@ -168,7 +172,7 @@ function Prontuario() {
         setInteracaoSocial(p.interacaoSocial);
         setMotivacao(p.motivacao);
 
-        setEditando(p.id);
+        setVisualizando(true);
 
         window.scrollTo({
             top: 0,
@@ -222,7 +226,10 @@ function Prontuario() {
                             className="border rounded px-3 py-2 w-full"
                             placeholder="Paciente"
                             value={paciente}
-                            onChange={(e) => buscarPaciente(e.target.value)}
+                            onChange={(e) => {
+                                setVisualizando(false);
+                                buscarPaciente(e.target.value);
+                            }}
                         />
 
                         {sugestoes.length > 0 && (
@@ -247,23 +254,23 @@ function Prontuario() {
 
                     <div className="grid md:grid-cols-3 gap-3">
 
-                        <CampoNumero label="Humor (1-10)" value={humor} setter={setHumor} />
-                        <CampoNumero label="Ansiedade (1-10)" value={ansiedade} setter={setAnsiedade} />
-                        <CampoNumero label="Estresse (1-10)" value={estresse} setter={setEstresse} />
-                        <CampoNumero label="Irritabilidade (1-10)" value={irritabilidade} setter={setIrritabilidade} />
-                        <CampoNumero label="Tristeza (1-10)" value={tristeza} setter={setTristeza} />
+                        <CampoNumero label="Humor (1-10)" value={humor} setter={setHumor} disabled={visualizando} />
+                        <CampoNumero label="Ansiedade (1-10)" value={ansiedade} setter={setAnsiedade} disabled={visualizando} />
+                        <CampoNumero label="Estresse (1-10)" value={estresse} setter={setEstresse} disabled={visualizando} />
+                        <CampoNumero label="Irritabilidade (1-10)" value={irritabilidade} setter={setIrritabilidade} disabled={visualizando} />
+                        <CampoNumero label="Tristeza (1-10)" value={tristeza} setter={setTristeza} disabled={visualizando} />
 
-                        <CampoNumero label="Sono (1-10)" value={sono} setter={setSono} />
-                        <CampoNumero label="Energia (1-10)" value={energia} setter={setEnergia} />
-                        <CampoNumero label="Apetite (1-10)" value={apetite} setter={setApetite} />
+                        <CampoNumero label="Sono (1-10)" value={sono} setter={setSono} disabled={visualizando} />
+                        <CampoNumero label="Energia (1-10)" value={energia} setter={setEnergia} disabled={visualizando} />
+                        <CampoNumero label="Apetite (1-10)" value={apetite} setter={setApetite} disabled={visualizando} />
 
-                        <CampoNumero label="Concentração (1-10)" value={concentracao} setter={setConcentracao} />
-                        <CampoNumero label="Pensamentos negativos (1-10)" value={pensamentosNegativos} setter={setPensamentosNegativos} />
-                        <CampoNumero label="Ruminação (1-10)" value={ruminacao} setter={setRuminacao} />
+                        <CampoNumero label="Concentração (1-10)" value={concentracao} setter={setConcentracao} disabled={visualizando} />
+                        <CampoNumero label="Pensamentos negativos (1-10)" value={pensamentosNegativos} setter={setPensamentosNegativos} disabled={visualizando} />
+                        <CampoNumero label="Ruminação (1-10)" value={ruminacao} setter={setRuminacao} disabled={visualizando} />
 
-                        <CampoNumero label="Produtividade (1-10)" value={produtividade} setter={setProdutividade} />
-                        <CampoNumero label="Interação social (1-10)" value={interacaoSocial} setter={setInteracaoSocial} />
-                        <CampoNumero label="Motivação (1-10)" value={motivacao} setter={setMotivacao} />
+                        <CampoNumero label="Produtividade (1-10)" value={produtividade} setter={setProdutividade} disabled={visualizando} />
+                        <CampoNumero label="Interação social (1-10)" value={interacaoSocial} setter={setInteracaoSocial} disabled={visualizando} />
+                        <CampoNumero label="Motivação (1-10)" value={motivacao} setter={setMotivacao} disabled={visualizando} />
 
                     </div>
 
@@ -272,14 +279,26 @@ function Prontuario() {
                         className="border rounded px-3 py-2"
                         placeholder="Observações da sessão"
                         value={observacoes}
+                        disabled={visualizando}
                         onChange={(e) => setObservacoes(e.target.value)}
                     />
 
                     <div className="flex gap-3">
+                        {!visualizando && (
+                            <button className="bg-indigo-600 text-white px-4 py-2 rounded">
+                                Salvar sessão
+                            </button>
+                        )}
 
-                        <button className="bg-indigo-600 text-white px-4 py-2 rounded">
-                            {editando ? "Salvar edição" : "Salvar sessão"}
-                        </button>
+                        {visualizando && (
+                            <button
+                                type="button"
+                                onClick={limparCampos}
+                                className="bg-gray-300 px-4 py-2 rounded"
+                            >
+                                Fechar
+                            </button>
+                        )}
 
                         {editando && (
                             <button
@@ -339,10 +358,10 @@ function Prontuario() {
                             </p>
                             <div className="flex gap-3 mt-4">
                                 <button
-                                    onClick={() => iniciarEdicao(p)}
+                                    onClick={() => visualizarProntuario(p)}
                                     className="text-blue-600 text-sm hover:underline"
                                 >
-                                    Editar
+                                    Visualizar
                                 </button>
                                 <button
                                     onClick={() => remover(p.id)}

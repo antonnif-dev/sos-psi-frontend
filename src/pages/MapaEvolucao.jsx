@@ -28,23 +28,24 @@ export default function MapaEvolucao() {
   const [dados, setDados] = useState([]);
   const [sintomaSelecionado, setSintomaSelecionado] = useState("humor");
   const { user } = useAuth();
-  const { tenantId } = useTenant();
+  const { tenant } = useTenant();
+  const tenantId = tenant?.id;
 
   useEffect(() => {
     async function carregarPacientes() {
-      if (!tenantId || !user) return;
-      const res = await listarPacientes(tenantId, user.uid);
+      if (!user) return;
+      const res = await listarPacientes();
       setPacientes(res);
     }
     carregarPacientes();
-  }, [tenantId, user]);
+  }, [user]);
 
-  async function carregarDados(pacienteNome) {
+  async function carregarDados(pacienteId) {
 
     const prontuarios = await listarProntuarios(tenantId);
 
     const filtrado = prontuarios
-      .filter((p) => p.paciente === pacienteNome)
+      .filter((p) => p.pacienteId === pacienteId)
       .sort((a, b) => new Date(a.dataSessao) - new Date(b.dataSessao));
 
     const formatado = filtrado.map((p, index) => {
@@ -129,9 +130,9 @@ export default function MapaEvolucao() {
   }
 
   function selecionarPaciente(e) {
-    const nome = e.target.value;
-    setPacienteSelecionado(nome);
-    carregarDados(nome);
+    const id = e.target.value;
+    setPacienteSelecionado(id);
+    carregarDados(id);
   }
 
   const ultimo = dados[dados.length - 1] || {};
@@ -154,6 +155,8 @@ export default function MapaEvolucao() {
     ? Math.round(ultimo.saudeGeral * 10)
     : 0;
 
+  console.log(pacientes);
+
   return (
     <div className="p-6 space-y-10">
 
@@ -172,7 +175,7 @@ export default function MapaEvolucao() {
         </option>
 
         {pacientes.map((p) => (
-          <option key={p.id} value={p.nome}>
+          <option key={p.id} value={p.id}>
             {p.nome}
           </option>
         ))}

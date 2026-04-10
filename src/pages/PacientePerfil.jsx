@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { listarObservacoes, criarObservacao, listarPacientes } from "../services/pacientesService";
+import { listarPacientes } from "../services/pacientesService";
+import { listarObservacoes, criarObservacao } from "../services/observacoesService";
 import Card from "../components/Card";
 import { auth } from "../services/firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -12,8 +13,6 @@ function PacientePerfil() {
     const [observacoes, setObservacoes] = useState([]);
     const [novaObs, setNovaObs] = useState("");
 
-    const tenantId = user?.tenantId || "tenant1"; // fallback
-
     // observar autenticação
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (u) => {
@@ -21,7 +20,6 @@ function PacientePerfil() {
                 setUser({
                     uid: u.uid,
                     email: u.email,
-                    tenantId: "tenant1" // ou buscar do Firestore se cada usuário tiver tenant
                 });
             } else {
                 setUser(null);
@@ -33,21 +31,20 @@ function PacientePerfil() {
     // carregar paciente quando user estiver definido
     useEffect(() => {
         if (!user) return;
-
         async function carregarPaciente() {
             try {
-                const data = await listarPacientes(tenantId);
+                const data = await listarPacientes();
                 const p = data.find(p => p.id === id);
                 setPaciente(p || {});
-                const obs = await listarObservacoes(tenantId, id);
+                const obs = await listarObservacoes("tenant1", id); //mudar depois para outras tenants
                 setObservacoes(obs);
+
             } catch (err) {
                 console.error("ERRO:", err);
             }
         }
-
         carregarPaciente();
-    }, [user, id, tenantId]);
+    }, [user, id]);
 
     if (!user) return <p>Carregando usuário...</p>;
     if (!paciente) return <p>Carregando paciente...</p>;
@@ -56,8 +53,8 @@ function PacientePerfil() {
 
     async function salvarObservacao() {
         if (!novaObs.trim()) return;
-        await criarObservacao(tenantId, id, novaObs);
-        const obs = await listarObservacoes(tenantId, id);
+        await criarObservacao("tenant1", id, novaObs);
+        const obs = await listarObservacoes("tenant1", id); //mudar depois para outras tenants
         setObservacoes(obs);
         setNovaObs("");
     }

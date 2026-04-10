@@ -162,8 +162,8 @@ function Agenda() {
     }
 
     function nomePaciente(id) {
-        const p = pacientes.find(p => p.id === id);
-        return p ? p.nome : "";
+        const p = pacientes.find(p => p.id === id || p.pacienteId === id);
+        return p?.nome || "";
     }
 
     function abrirNovo(data, horario) {
@@ -227,7 +227,7 @@ function Agenda() {
     }
 
     const sugestoes = pacientes.filter(p =>
-        p.nome.toLowerCase().includes(buscaPaciente.toLowerCase())
+        (p.nome || "").toLowerCase().includes(buscaPaciente.toLowerCase())
     );
 
     return (

@@ -16,7 +16,6 @@ function Pacientes() {
     const [busca, setBusca] = useState("");
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
-    const tenantId = user?.tenantId || "tenant1";
 
     const [novoPaciente, setNovoPaciente] = useState({
         nome: "",
@@ -47,7 +46,7 @@ function Pacientes() {
 
     async function carregarPacientes() {
         if (!user) return;
-        const data = await listarPacientes(tenantId, user.uid);
+        const data = await listarPacientes();
         setPacientes(data);
     }
 
@@ -56,8 +55,7 @@ function Pacientes() {
             if (u) {
                 setUser({
                     uid: u.uid,
-                    email: u.email,
-                    tenantId: "tenant1"
+                    email: u.email
                 });
             } else {
                 setUser(null);
@@ -79,7 +77,7 @@ function Pacientes() {
     async function handleCriar() {
         if (!novoPaciente.nome) return;
         const telefoneFormatado = `55${novoPaciente.ddd}${novoPaciente.telefone}`;
-        await criarPaciente(user.tenantId, {
+        await criarPaciente({
             ...novoPaciente,
             telefone: telefoneFormatado
         });
@@ -112,21 +110,15 @@ function Pacientes() {
     }
 
     async function handleEditar(id) {
-
-        await editarPaciente(user.tenantId, id, pacienteEditado);
-
+        await editarPaciente(id, pacienteEditado);
         setEditandoId(null);
         setPacienteEditado({});
-
         carregarPacientes();
     }
 
     async function handleDeletar(id) {
-
         if (!confirm("Deseja excluir este paciente?")) return;
-
-        await deletarPaciente(user.tenantId, id);
-
+        await deletarPaciente(id);
         carregarPacientes();
     }
 
