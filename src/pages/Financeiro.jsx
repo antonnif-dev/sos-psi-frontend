@@ -12,6 +12,38 @@ function Financeiro() {
    const [sugestoes, setSugestoes] = useState([]);
    const [modalTipo, setModalTipo] = useState(null);
 
+   const [filtroMes, setFiltroMes] = useState("");
+   const [filtroAno, setFiltroAno] = useState("");
+   const [dataInicial, setDataInicial] = useState("");
+   const [dataFinal, setDataFinal] = useState("");
+
+   function aplicarFiltros(lista) {
+      let filtrados = [...lista];
+
+      // filtro por mês e ano
+      if (filtroMes && filtroAno) {
+         filtrados = filtrados.filter(p => {
+            const data = new Date(p.pagoEm || p.dataSessao);
+            return (
+               data.getMonth() + 1 === Number(filtroMes) &&
+               data.getFullYear() === Number(filtroAno)
+            );
+         });
+      }
+
+      // filtro por período
+      if (dataInicial && dataFinal) {
+         const inicio = new Date(dataInicial);
+         const fim = new Date(dataFinal);
+
+         filtrados = filtrados.filter(p => {
+            const data = new Date(p.pagoEm || p.dataSessao);
+            return data >= inicio && data <= fim;
+         });
+      }
+      return filtrados;
+   }
+
    async function carregar() {
       const dados = await listarPagamentos();
       setPagamentos(dados);
@@ -84,7 +116,7 @@ function Financeiro() {
    }
 
    if (modalTipo === "realizados") {
-      listaModal = pagamentosRealizados;
+      listaModal = aplicarFiltros(pagamentosRealizados);
       tituloModal = "Pagamentos realizados";
    }
 
@@ -334,12 +366,70 @@ function Financeiro() {
                      </h2>
 
                      <button
-                        onClick={() => setModalTipo(null)}
+                        onClick={() => {
+                           setModalTipo(null);
+                           setFiltroMes("");
+                           setFiltroAno("");
+                           setDataInicial("");
+                           setDataFinal("");
+                        }}
                         className="text-gray-500 hover:text-gray-700"
                      >
                         Fechar
                      </button>
                   </div>
+
+                  {modalTipo === "realizados" && (
+                     <div className="mb-4 space-y-3">
+                        <div className="flex gap-2">
+                           <select
+                              value={filtroMes}
+                              onChange={(e) => setFiltroMes(e.target.value)}
+                              className="border rounded px-2 py-1 text-sm"
+                           >
+                              <option value="">Mês</option>
+                              <option value="1">Jan</option>
+                              <option value="2">Fev</option>
+                              <option value="3">Mar</option>
+                              <option value="4">Abr</option>
+                              <option value="5">Mai</option>
+                              <option value="6">Jun</option>
+                              <option value="7">Jul</option>
+                              <option value="8">Ago</option>
+                              <option value="9">Set</option>
+                              <option value="10">Out</option>
+                              <option value="11">Nov</option>
+                              <option value="12">Dez</option>
+                           </select>
+
+                           <input
+                              type="number"
+                              placeholder="Ano"
+                              value={filtroAno}
+                              onChange={(e) => setFiltroAno(e.target.value)}
+                              className="border rounded px-2 py-1 text-sm w-24"
+                           />
+                        </div>
+
+                        <div className="flex gap-2 items-center">
+                           <input
+                              type="date"
+                              value={dataInicial}
+                              onChange={(e) => setDataInicial(e.target.value)}
+                              className="border rounded px-2 py-1 text-sm"
+                           />
+
+                           <span className="text-sm text-gray-500">até</span>
+
+                           <input
+                              type="date"
+                              value={dataFinal}
+                              onChange={(e) => setDataFinal(e.target.value)}
+                              className="border rounded px-2 py-1 text-sm"
+                           />
+                        </div>
+                     </div>
+                  )}
 
                   <div className="space-y-3">
                      {listaModal.map(p => (

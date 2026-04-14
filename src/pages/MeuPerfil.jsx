@@ -10,6 +10,7 @@ import {
     addDoc
 } from "firebase/firestore";
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import { criarUsuario } from "../services/meuPerfilService";
 
 export default function MeuPerfil() {
     const { user: authUser } = useAuth(); // usuário logado do Firebase Auth
@@ -18,14 +19,18 @@ export default function MeuPerfil() {
     const [perfil, setPerfil] = useState({
         nome: "",
         email: "",
-        telefone: ""
+        telefone: "",
+        profissionalId: "",
+        role: ""
     });
 
     const [novoUsuario, setNovoUsuario] = useState({
         nome: "",
         email: "",
         senha: "",
-        role: "user"
+        telefone: "",
+        profissionalId: "",
+        role: "psicologo"
     });
 
     const [senhaAtual, setSenhaAtual] = useState("");
@@ -53,7 +58,9 @@ export default function MeuPerfil() {
                     setPerfil({
                         nome: data.nome || "",
                         email: data.email || "",
-                        telefone: data.telefone || ""
+                        telefone: data.telefone || "",
+                        profissionalId: data.profissionalId || "",
+                        role: data.role || ""
                     });
                     setRole(data.role || "user"); // define role
                     break;
@@ -80,7 +87,13 @@ export default function MeuPerfil() {
         if (!tenantId) return;
 
         const ref = doc(db, "tenants", tenantId, "usuarios", authUser.uid);
-        await updateDoc(ref, perfil);
+        await updateDoc(ref, {
+            nome: perfil.nome,
+            email: perfil.email,
+            telefone: perfil.telefone,
+            profissionalId: perfil.profissionalId,
+            role: perfil.role
+        });
         alert("Perfil atualizado com sucesso!");
     }
 
@@ -105,21 +118,25 @@ export default function MeuPerfil() {
     }
 
     // --- Criar usuário (apenas admin) ---
-    async function criarUsuario() {
-        if (!tenantId) return;
-        if (!novoUsuario.nome || !novoUsuario.email || !novoUsuario.senha) {
-            alert("Preencha todos os campos do novo usuário");
-            return;
-        }
-
+    async function criarNovoUsuario() {
         try {
-            const usuariosRef = collection(db, "tenants", tenantId, "usuarios");
-            await addDoc(usuariosRef, novoUsuario);
-            setNovoUsuario({ nome: "", email: "", senha: "", role: "user" });
-            alert("Usuário criado com sucesso!");
+            await criarUsuario({
+                ...novoUsuario,
+                tenantId
+            });
+
+            alert("Usuário criado com sucesso");
+
+            setNovoUsuario({
+                nome: "",
+                email: "",
+                senha: "",
+                role: "psicologo"
+            });
+
         } catch (err) {
             console.error(err);
-            alert("Erro ao criar usuário: " + err.message);
+            alert("Erro ao criar usuário");
         }
     }
 
@@ -152,6 +169,13 @@ export default function MeuPerfil() {
                     value={perfil.telefone}
                     onChange={handleChange}
                     placeholder="Telefone"
+                    className="border p-2 rounded"
+                />
+                <input
+                    name="profissionalId"
+                    value={perfil.profissionalId || ""}
+                    onChange={handleChange}
+                    placeholder="Registro Profissional"
                     className="border p-2 rounded"
                 />
 
@@ -217,18 +241,27 @@ export default function MeuPerfil() {
                         placeholder="Senha"
                         className="border p-2 rounded"
                     />
-                    <select
-                        name="role"
-                        value={novoUsuario.role}
+                    <input
+                        name="telefone"
+                        value={novoUsuario.telefone}
                         onChange={handleNovoUsuarioChange}
+                        placeholder="Telefone"
                         className="border p-2 rounded"
-                    >
-                        <option value="user">Usuário</option>
-                        <option value="admin">Admin</option>
-                    </select>
-
+                    />
+                    {isAdmin && (
+                        <select
+                            name="role"
+                            value={novoUsuario.role}
+                            onChange={handleNovoUsuarioChange}
+                            className="border p-2 rounded"
+                        >
+                            <option value="psicologo">Psicólogo</option>
+                            <option value="secretaria">Secretaria</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    )}
                     <button
-                        onClick={criarUsuario}
+                        onClick={criarNovoUsuario}
                         className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
                     >
                         Criar Usuário

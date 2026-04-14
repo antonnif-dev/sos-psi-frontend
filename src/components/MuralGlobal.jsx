@@ -42,6 +42,9 @@ function MuralGlobal({ tenantNome }) {
     }, [tenantNome]);
 
     useEffect(() => {
+        if (!tenantNome) return;
+        const unsubs = [];
+
         abas.forEach((a) => {
             const q = query(
                 collection(db, "mural", a.id, "mensagens"),
@@ -49,9 +52,8 @@ function MuralGlobal({ tenantNome }) {
                 limit(50)
             );
 
-            onSnapshot(q, (snapshot) => {
+            const unsubscribe = onSnapshot(q, (snapshot) => {
                 let contador = 0;
-
                 snapshot.forEach((doc) => {
                     const msg = doc.data();
                     const dataMsg = msg.data?.toDate?.();
@@ -60,14 +62,18 @@ function MuralGlobal({ tenantNome }) {
                         contador++;
                     }
                 });
-
                 setNaoLidas(prev => ({
                     ...prev,
                     [a.id]: contador
                 }));
             });
+            unsubs.push(unsubscribe);
         });
-    }, [ultimaLeitura]);
+
+        return () => {
+            unsubs.forEach((u) => u());
+        };
+    }, [ultimaLeitura, tenantNome]);
 
     const mensagemSistema = {
         discussoes_clinicas: "Qual caso clínico recente te trouxe mais reflexão?",
@@ -78,7 +84,7 @@ function MuralGlobal({ tenantNome }) {
 
     // carregar mensagens da aba ativa
     useEffect(() => {
-
+        if (!tenantNome) return;
         const q = query(
             collection(db, "mural", aba, "mensagens"),
             orderBy("data", "asc"),
@@ -86,30 +92,19 @@ function MuralGlobal({ tenantNome }) {
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
-
             const lista = [];
-
             snapshot.forEach((doc) => {
                 lista.push({ id: doc.id, ...doc.data() });
             });
-
             setMensagens(lista);
-
         });
-
         return () => unsubscribe();
-
-    }, [aba]);
-
-
+    }, [aba, tenantNome]);
 
     // enviar mensagem
     const enviarMensagem = async () => {
-
         if (!novaMensagem.trim()) return;
-
         try {
-
             await addDoc(
                 collection(db, "mural", aba, "mensagens"),
                 {
@@ -118,15 +113,10 @@ function MuralGlobal({ tenantNome }) {
                     data: serverTimestamp()
                 }
             );
-
             setNovaMensagem("");
-
         } catch (erro) {
-
             console.error("Erro ao enviar mensagem:", erro);
-
         }
-
     };
 
     const abrirAba = async (id) => {
@@ -154,9 +144,7 @@ function MuralGlobal({ tenantNome }) {
   ${maximizado ? "h-[70vh]" : "h-[90px]"}
   `}
         >
-
             {/* HEADER */}
-
             <div
                 className="bg-gray-900 text-white px-3 py-2 flex justify-between items-center cursor-pointer"
                 onDoubleClick={() => setMaximizado(!maximizado)}

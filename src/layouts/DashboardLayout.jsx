@@ -14,6 +14,7 @@ function DashboardLayout({ children }) {
     const [tenantNome, setTenantNome] = useState("Carregando...");
     const [mostrarNotificacoes, setMostrarNotificacoes] = useState(false);
     const [nomeUsuario, setNomeUsuario] = useState("");
+    const [roleUsuario, setRoleUsuario] = useState("");
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -31,6 +32,7 @@ function DashboardLayout({ children }) {
 
                         setTenantNome(tenantData.nome);
                         setNomeUsuario(userData.nome);
+                        setRoleUsuario(userData.role);
 
                         break;
                     }
@@ -67,12 +69,21 @@ function DashboardLayout({ children }) {
                     <Link to="/agenda">Agenda</Link>
                     <Link to="/sessoes">Sessões</Link>
                     <Link to="/financeiro">Financeiro</Link>
-                    <Link to="/documentos">Documentos</Link>
-                    <Link to="/prontuario">Prontuário</Link>
-                    <Link to="/mapa-evolucao">Mapa de Evolução</Link>
-                    <Link to="/prescricao">Prescrição</Link>
+                    {roleUsuario !== "secretaria" && (
+                        <>
+                            <Link to="/documentos">Documentos</Link>
+                            <Link to="/prontuario">Prontuário</Link>
+                            <Link to="/mapa-evolucao">Mapa de Evolução</Link>
+                            <Link to="/prescricao">Prescrição</Link>
+                        </>
+                    )}
+
                     <Link to="/meu-perfil"><UserPen size={20} /></Link>
-                    <Link to="/configuracoes" className="flex justify-center mt-5"><Settings size={20} /></Link>
+                    {roleUsuario === "admin" && (
+                        <>
+                            <Link to="/configuracoes" className="flex justify-center mt-5"><Settings size={20} /></Link>
+                        </>
+                    )}
                 </nav>
             </aside>
             <button
@@ -82,7 +93,7 @@ function DashboardLayout({ children }) {
             >
                 {menuAberto ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
             </button>
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-col flex-1 min-w-0">
                 {/* TOPBAR */}
                 <div className="h-20 bg-white border-b shadow-sm grid grid-cols-3 items-center px-6">
 

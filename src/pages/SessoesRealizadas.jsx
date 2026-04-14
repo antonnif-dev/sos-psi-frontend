@@ -255,98 +255,101 @@ function SessoesRealizadas() {
 
             {/* TABELA */}
             <Card>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
 
-                <table className="w-full text-sm">
+                        <thead>
 
-                    <thead>
+                            <tr className="border-b">
 
-                        <tr className="border-b">
+                                <th className="text-left p-2">Paciente</th>
+                                <th className="text-left p-2">Data</th>
+                                <th className="text-left p-2">Status</th>
+                                <th className="text-left p-2">Ações</th>
+                            </tr>
 
-                            <th className="text-left p-2">Paciente</th>
-                            <th className="text-left p-2">Data</th>
-                            <th className="text-left p-2">Horário</th>
-                            <th className="text-left p-2">Status</th>
-                            <th className="text-left p-2">Ações</th>
-                        </tr>
+                        </thead>
 
-                    </thead>
+                        <tbody>
 
-                    <tbody>
+                            {sessoes.map(s => {
 
-                        {sessoes.map(s => {
+                                const d = new Date(s.data);
 
-                            const d = new Date(s.data);
+                                return (
 
-                            return (
+                                    <tr
+                                        key={s.id}
+                                        className="border-b hover:bg-gray-50"
+                                    >
 
-                                <tr
-                                    key={s.id}
-                                    className="border-b hover:bg-gray-50"
-                                >
+                                        <td className="p-2">
+                                            {nomePaciente(s.pacienteId)}
+                                        </td>
 
-                                    <td className="p-2">
-                                        {nomePaciente(s.pacienteId)}
-                                    </td>
+                                        <td className="p-2">
+                                            <div>
+                                                <div>
+                                                    {d.toLocaleDateString("pt-BR")}
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                    {d.toLocaleTimeString("pt-BR", {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit"
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </td>
 
-                                    <td className="p-2">
-                                        {d.toLocaleDateString("pt-BR")}
-                                    </td>
+                                        <td className="p-2">
+                                            <span className={`px-2 py-1 rounded text-xs ${coresStatus[s.status]}`}>
+                                                {s.status}
+                                            </span>
+                                        </td>
 
-                                    <td className="p-2">
-                                        {d.toLocaleTimeString("pt-BR", {
-                                            hour: "2-digit",
-                                            minute: "2-digit"
-                                        })}
-                                    </td>
+                                        <td className="p-2 flex gap-2">
+                                            {s.status === "agendada" && (
+                                                <button
+                                                    className="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700"
+                                                    onClick={() => abrirModalAviso(s)}
+                                                >
+                                                    Avisar
+                                                </button>
+                                            )}
 
-                                    <td className="p-2">
-                                        <span className={`px-2 py-1 rounded text-xs ${coresStatus[s.status]}`}>
-                                            {s.status}
-                                        </span>
-                                    </td>
+                                            {s.status === "realizada" && (
+                                                <button
+                                                    className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700"
+                                                    onClick={() => abrirMensagemRealizada(s)}
+                                                >
+                                                    Agradecer
+                                                </button>
+                                            )}
 
-                                    <td className="p-2 flex gap-2">
-                                        {s.status === "agendada" && (
-                                            <button
-                                                className="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700"
-                                                onClick={() => abrirModalAviso(s)}
-                                            >
-                                                Avisar
-                                            </button>
-                                        )}
+                                            {s.status === "faltou" && (
+                                                <button
+                                                    className="bg-yellow-600 text-white px-3 py-1 rounded text-xs hover:bg-yellow-700"
+                                                    onClick={() => abrirMensagemFalta(s)}
+                                                >
+                                                    Remarcar
+                                                </button>
+                                            )}
 
-                                        {s.status === "realizada" && (
-                                            <button
-                                                className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700"
-                                                onClick={() => abrirMensagemRealizada(s)}
-                                            >
-                                                Agradecer
-                                            </button>
-                                        )}
-
-                                        {s.status === "faltou" && (
-                                            <button
-                                                className="bg-yellow-600 text-white px-3 py-1 rounded text-xs hover:bg-yellow-700"
-                                                onClick={() => abrirMensagemFalta(s)}
-                                            >
-                                                Remarcar
-                                            </button>
-                                        )}
-
-                                        {s.status === "cancelada" && (
-                                            <button
-                                                className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700"
-                                                onClick={() => abrirMensagemCancelada(s)}
-                                            >
-                                                Remarcar
-                                            </button>
-                                        )}
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+                                            {s.status === "cancelada" && (
+                                                <button
+                                                    className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700"
+                                                    onClick={() => abrirMensagemCancelada(s)}
+                                                >
+                                                    Remarcar
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
             </Card>
 
             {modalAvisoAberto && (
