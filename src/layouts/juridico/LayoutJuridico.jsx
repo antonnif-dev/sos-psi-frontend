@@ -1,42 +1,14 @@
-//versão que cada segmento tem sua página própria 
-{/*
-import { useTenant } from "../hooks/useTenant";
-import LayoutPsicologia from "./psicologia/LayoutPsicologia";
-import LayoutJuridico from "./juridico/LayoutJuridico";
-
-function DashboardLayout({ children }) {
-    const tenant = useTenant();
-
-    if (!tenant || !tenant.segmento) {
-        return <div>Carregando...</div>;
-    }
-
-    const layouts = {
-        psicologia: LayoutPsicologia,
-        juridico: LayoutJuridico
-    };
-
-    const Layout = layouts[tenant.segmento] || LayoutPsicologia;
-
-    return <Layout>{children}</Layout>;
-}
-
-export default DashboardLayout;
-*/}
-
-
-//versão que usa segmentCofig.js
 import { Link } from "react-router-dom";
-import LogoutButton from "../components/LogoutButton";
+import LogoutButton from "../../components/LogoutButton";
 import { useState } from "react";
 import { PanelLeftClose, PanelLeftOpen, Settings, UserPen } from "lucide-react";
-import NotificationBell from "../components/NotificationBell";
-import MuralGlobal from "../components/MuralGlobal";
+import NotificationBell from "../../components/NotificationBell";
+import MuralGlobal from "../../components/MuralGlobal";
 
-import { useTenant } from "../hooks/useTenant";
-import { segmentConfig } from "../config/segmentConfig";
+import { useTenant } from "../../hooks/useTenant";
+import { segmentConfig } from "../../config/segmentConfig";
 
-function DashboardLayout({ children }) {
+function LayoutJuridico({ children }) {
     const [menuAberto, setMenuAberto] = useState(true);
 
     const tenant = useTenant();
@@ -45,8 +17,6 @@ function DashboardLayout({ children }) {
 
     const config =
         segmentConfig[tenant.segmento] || segmentConfig.psicologia;
-
-    const theme = config.theme;
 
     const roleUsuario = tenant.usuario?.role;
 
@@ -63,11 +33,11 @@ function DashboardLayout({ children }) {
             {/* SIDEBAR */}
             <aside
                 className={`
-                    ${theme.sidebar} text-white transition-all duration-300 overflow-hidden
+                    bg-gray-900 text-white transition-all duration-300 overflow-hidden
                     ${menuAberto ? "w-36 md:w-56 p-5" : "w-0 p-0"}
                 `}
             >
-                <h2 className={`text-xl font-bold mt-5 mb-20 ${theme?.primaryText}`}>
+                <h2 className="text-xl font-bold mt-5 mb-20">
                     {tenant.nome}
                 </h2>
 
@@ -134,11 +104,7 @@ function DashboardLayout({ children }) {
                 </div>
 
                 {/* MAIN */}
-                <main
-                    className={`
-                    flex-1 p-8 overflow-y-auto pb-[20vh]
-                    ${theme?.background || "bg-gray-100"}
-                    `}>
+                <main className="flex-1 bg-gray-100 p-8 overflow-y-auto pb-[20vh]">
                     {children}
                 </main>
 
@@ -150,4 +116,4 @@ function DashboardLayout({ children }) {
     );
 }
 
-export default DashboardLayout;
+export default LayoutJuridico;

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import SegmentRoute from "./routes/SegmentRoute";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -79,6 +80,21 @@ function App() {
                                 <Prontuario />
                             </DashboardLayout>
                         </PrivateRoute>} />
+
+                {/* Exemplo de prontuario so para psicologia
+                <Route
+                    path="/prontuario"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["psicologia"]}>
+                                <DashboardLayout>
+                                    <Prontuario />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+                 */}
                 <Route path="/mapa-evolucao"
                     element={
                         <PrivateRoute>
@@ -86,13 +102,29 @@ function App() {
                                 <MapaEvolucao />
                             </DashboardLayout>
                         </PrivateRoute>} />
-                <Route path="/prescricao"
+
+                <Route path="/prescricoes"
                     element={
                         <PrivateRoute>
                             <DashboardLayout>
                                 <Prescrição />
                             </DashboardLayout>
                         </PrivateRoute>} />
+
+                {/* Exemplo de prescrição so para juridico
+                <Route
+                    path="/prescricoes"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["juridico"]}>
+                                <DashboardLayout>
+                                    <Prescrição />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+                */}
                 <Route path="/configuracoes"
                     element={
                         <PrivateRoute>

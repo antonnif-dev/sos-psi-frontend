@@ -4,11 +4,14 @@ import App from "./App";
 import "./index.css";
 import { AuthProvider } from "./context/AuthContext";
 import { TenantProvider } from "./context/TenantContext";
+import { SegmentProvider } from "./context/SegmentContext";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
- <AuthProvider>
-  <TenantProvider>
-   <App />
-  </TenantProvider>
- </AuthProvider>
+    <AuthProvider>
+        <SegmentProvider>
+            <TenantProvider>
+                <App />
+            </TenantProvider>
+        </SegmentProvider>
+    </AuthProvider>
 );

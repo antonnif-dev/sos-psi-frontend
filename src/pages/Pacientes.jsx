@@ -9,13 +9,18 @@ import Card from "../components/Card";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../services/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { useSegment } from "../hooks/useSegment";
 
 function Pacientes() {
-
     const [pacientes, setPacientes] = useState([]);
     const [busca, setBusca] = useState("");
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
+
+    
+    const segment = useSegment();
+    
+    const labels = segment.labels;
 
     const [novoPaciente, setNovoPaciente] = useState({
         nome: "",
@@ -44,6 +49,8 @@ function Pacientes() {
     const [editandoId, setEditandoId] = useState(null);
     const [pacienteEditado, setPacienteEditado] = useState({});
 
+
+
     async function carregarPacientes() {
         if (!user) return;
         const data = await listarPacientes();
@@ -69,6 +76,8 @@ function Pacientes() {
     useEffect(() => {
         carregarPacientes();
     }, [user]);
+
+    if (!segment || !segment.labels) return null;
 
     const pacientesFiltrados = pacientes.filter(p =>
         p.nome?.toLowerCase().includes(busca.toLowerCase())
@@ -127,11 +136,11 @@ function Pacientes() {
 
             <div>
                 <h1 className="text-2xl font-semibold text-gray-800">
-                    Pacientes
+                    {labels.pacientes}
                 </h1>
 
                 <p className="text-sm text-gray-500">
-                    {pacientes.length} paciente(s) cadastrados
+                    {pacientes.length} {labels.paciente}(s) cadastrados
                 </p>
             </div>
 
@@ -353,7 +362,7 @@ function Pacientes() {
             {/* CRIAR PACIENTE */}
 
             <h1 className="text-2xl flex justify-center pt-5 font-semibold text-gray-800">
-                Criar Paciente
+                Criar {labels.paciente}
             </h1>
 
             <Card>
@@ -529,7 +538,7 @@ function Pacientes() {
                     onClick={handleCriar}
                     className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm mt-3"
                 >
-                    Adicionar paciente
+                    Adicionar {labels.paciente}
                 </button>
             </Card>
 
