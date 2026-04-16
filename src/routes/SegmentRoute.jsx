@@ -3,9 +3,9 @@ import { useSegment } from "../hooks/useSegment";
 function SegmentRoute({ allowedSegments, children }) {
     const segment = useSegment();
 
-    if (!segment) return null;
+    if (!segment?.tenant) return null;
 
-    const segmentoAtual = segment.tenant.segmento;
+    const segmentoAtual = segment?.tenant?.segmento;
 
     if (!allowedSegments.includes(segmentoAtual)) {
         return <div>Acesso não permitido</div>;

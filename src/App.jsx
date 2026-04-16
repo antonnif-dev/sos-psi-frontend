@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SegmentRoute from "./routes/SegmentRoute";
-
+import ProfissaoRoute from "./routes/ProfissaoRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Pacientes from "./pages/Pacientes";
@@ -72,7 +72,7 @@ function App() {
                                 <Documentos />
                             </DashboardLayout>
                         </PrivateRoute>} />
-
+                {/* 
                 <Route path="/prontuario"
                     element={
                         <PrivateRoute>
@@ -80,21 +80,23 @@ function App() {
                                 <Prontuario />
                             </DashboardLayout>
                         </PrivateRoute>} />
+*/}
 
-                {/* Exemplo de prontuario so para psicologia
+                {/* Prontuário exibido apenas para psicólogos e nutricionista*/}
                 <Route
                     path="/prontuario"
                     element={
                         <PrivateRoute>
-                            <SegmentRoute allowedSegments={["psicologia"]}>
-                                <DashboardLayout>
-                                    <Prontuario />
-                                </DashboardLayout>
+                            <SegmentRoute allowedSegments={["saude"]}>
+                                <ProfissaoRoute allowedProfissoes={["psicologo", "nutricionista"]}>
+                                    <DashboardLayout>
+                                        <Prontuario />
+                                    </DashboardLayout>
+                                </ProfissaoRoute>
                             </SegmentRoute>
                         </PrivateRoute>
                     }
                 />
-                 */}
                 <Route path="/mapa-evolucao"
                     element={
                         <PrivateRoute>
@@ -115,12 +117,11 @@ function App() {
                 <Route
                     path="/prescricoes"
                     element={
-                        <PrivateRoute>
-                            <SegmentRoute allowedSegments={["juridico"]}>
-                                <DashboardLayout>
-                                    <Prescrição />
-                                </DashboardLayout>
-                            </SegmentRoute>
+                        <SegmentRoute allowedSegments={["profissionais"]}>
+    <ProfissaoRoute allowedProfissoes={["advogado"]}>
+        <Prontuario />
+    </ProfissaoRoute>
+</SegmentRoute>
                         </PrivateRoute>
                     }
                 />

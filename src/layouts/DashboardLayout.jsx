@@ -32,6 +32,7 @@ import { useState } from "react";
 import { PanelLeftClose, PanelLeftOpen, Settings, UserPen } from "lucide-react";
 import NotificationBell from "../components/NotificationBell";
 import MuralGlobal from "../components/MuralGlobal";
+import { profissoesConfig } from "../config/profissoesConfig";
 
 import { useTenant } from "../hooks/useTenant";
 import { segmentConfig } from "../config/segmentConfig";
@@ -45,6 +46,18 @@ function DashboardLayout({ children }) {
 
     const config =
         segmentConfig[tenant.segmento] || segmentConfig.psicologia;
+
+    const profissaoConfig = profissoesConfig[tenant.profissao] || {};
+
+    const menuBase = config?.menu || [];
+    const menuExtra = profissaoConfig?.menuExtra || [];
+
+    const menuFinal = [
+        ...menuBase,
+        ...menuExtra.filter(extra =>
+            !menuBase.some(base => base.path === extra.path)
+        )
+    ];
 
     const theme = config.theme;
 
@@ -72,7 +85,7 @@ function DashboardLayout({ children }) {
                 </h2>
 
                 <nav className="flex flex-col gap-4">
-                    {config.menu.map((item) => {
+                    {menuFinal.map((item) => {
                         // controle de role opcional
                         if (item.roles && !item.roles.includes(roleUsuario)) {
                             return null;
