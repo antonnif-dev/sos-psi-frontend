@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react"
 import { getNotificacoes } from "../services/notificacoesService"
 
-export default function Notificacoes(){
+export default function Notificacoes() {
   const [notificacoes, setNotificacoes] = useState([])
 
-  useEffect(()=>{
-    async function load(){
-      const data = await getNotificacoes();
-      console.log("NOTIFICACOES RECEBIDAS:", data);
-      setNotificacoes(data);
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await getNotificacoes();
+        console.log("NOTIFICACOES RECEBIDAS:", data);
+        setNotificacoes(data);
+      } catch (err) {
+        console.error("Erro ao carregar notificações:", err);
+      }
     }
-    load()
-  },[])
+    load();
+  }, []);
 
-  return(
+  return (
     <div className="p-6">
       <h1 className="text-xl font-bold mb-4">
         Notificações
@@ -21,9 +25,8 @@ export default function Notificacoes(){
       {notificacoes.map(n => (
         <div
           key={n.id}
-          className={`p-4 border rounded mb-2 ${
-            !n.read ? "bg-blue-50" : ""
-          }`}
+          className={`p-4 border rounded mb-2 ${!n.read ? "bg-blue-50" : ""
+            }`}
         >
           <h2 className="font-medium">{n.title}</h2>
           <p className="text-sm text-gray-500">
