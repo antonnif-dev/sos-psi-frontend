@@ -13,9 +13,10 @@ import {
     setDoc
 } from "firebase/firestore";
 
-function MuralGlobal({ tenantNome }) {
+// ALTERE A ASSINATURA:
+function MuralGlobal({ tenantNome, expandidoPadrao = false }) {
 
-    const [maximizado, setMaximizado] = useState(false);
+    const [maximizado, setMaximizado] = useState(expandidoPadrao);
     const [aba, setAba] = useState("discussoes_clinicas");
     const [mensagens, setMensagens] = useState([]);
     const [novaMensagem, setNovaMensagem] = useState("");
@@ -135,14 +136,12 @@ function MuralGlobal({ tenantNome }) {
     return (
         <div
             className={`
-  fixed bottom-0
-  right-2
-  bg-white border shadow-xl
-  w-[70%] md:w-[500px]
-  md:right-5
-  transition-all
-  ${maximizado ? "h-[70vh]" : "h-[90px]"}
-  `}
+        ${expandidoPadrao ? "relative" : "fixed bottom-0 right-2 md:right-5"}
+        bg-white border shadow-xl
+        ${expandidoPadrao ? "w-full max-w-6xl mx-auto" : "w-[70%] md:w-[500px]"}
+        transition-all
+        ${maximizado ? "h-[70vh]" : "h-[90px]"}
+    `}
         >
             {/* HEADER */}
             <div

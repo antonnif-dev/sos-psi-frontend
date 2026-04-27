@@ -1,0 +1,254 @@
+import { Link } from "react-router-dom";
+import LogoutButton from "../../components/LogoutButton";
+import { useState } from "react";
+import { PanelLeftClose, PanelLeftOpen, Settings, UserPen } from "lucide-react";
+import NotificationBell from "../../components/NotificationBell";
+import MuralGlobal from "../../components/MuralGlobal";
+
+import { useTenant } from "../../hooks/useTenant";
+import { segmentConfig } from "../../config/segmentConfig";
+
+function LayoutBeleza({ children }) {
+    const [menuAberto, setMenuAberto] = useState(true);
+
+    const tenant = useTenant();
+
+    if (!tenant) return null;
+
+    const config =
+        segmentConfig[tenant.segmento] || segmentConfig.psicologia;
+
+    const roleUsuario = tenant.usuario?.role;
+
+    const getSaudacao = () => {
+        const hora = new Date().getHours();
+        if (hora < 12) return "Bom dia";
+        if (hora < 18) return "Boa tarde";
+        return "Boa noite";
+    };
+
+    return (
+        <div className="flex h-screen bg-gradient-to-br from-[#fff8fc] via-[#fdeef7] to-[#fdf2f8] text-rose-900 overflow-hidden relative">
+
+            {/* SIDEBAR ESQUERDA */}
+            <aside
+                className={`
+                fixed md:relative top-0 left-0 h-full z-50
+                bg-white/90 backdrop-blur-2xl border-r border-pink-100 shadow-2xl
+                transition-all duration-300 flex flex-col
+                ${menuAberto ? "w-80 translate-x-0" : "w-0 md:w-24 -translate-x-full md:translate-x-0 overflow-hidden"}
+            `}
+            >
+
+                {/* HEADER */}
+                <div className="p-6 md:p-8 border-b border-pink-100">
+
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-400 via-rose-400 to-fuchsia-500 flex items-center justify-center text-white text-3xl shadow-xl mb-5">
+                        💄
+                    </div>
+
+                    {menuAberto && (
+                        <>
+                            <h2 className="text-2xl font-bold text-rose-700">
+                                {tenant.nome}
+                            </h2>
+
+                            <p className="text-sm text-rose-400 mt-2 leading-relaxed">
+                                Beleza, autoestima e atendimento sofisticado.
+                            </p>
+                        </>
+                    )}
+
+                </div>
+
+                {/* SAUDAÇÃO */}
+                <div className="p-6 md:p-8 border-b border-pink-100">
+
+                    {menuAberto ? (
+                        <>
+                            <p className="uppercase tracking-[0.25em] text-xs font-semibold text-fuchsia-500 mb-3">
+                                Painel de beleza
+                            </p>
+
+                            <h3 className="text-2xl font-bold text-rose-800 leading-tight mb-3">
+                                {getSaudacao()},<br />
+                                {tenant.usuario?.nome}
+                            </h3>
+
+                            <p className="text-sm text-rose-400">
+                                Encante clientes com gestão refinada e experiência premium.
+                            </p>
+                        </>
+                    ) : (
+                        <div className="flex justify-center text-2xl">
+                            ✨
+                        </div>
+                    )}
+
+                </div>
+
+                {/* MENU */}
+                <nav className="flex-1 p-4 md:p-6 flex flex-col gap-3 overflow-y-auto">
+
+                    {config.menu.map((item) => {
+                        if (item.roles && !item.roles.includes(roleUsuario)) {
+                            return null;
+                        }
+
+                        return (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`
+                                rounded-2xl transition-all font-medium
+                                hover:bg-pink-50 hover:text-rose-700
+                                ${menuAberto
+                                        ? "px-5 py-4"
+                                        : "flex justify-center items-center py-4"
+                                    }
+                            `}
+                            >
+                                {menuAberto ? item.label : "•"}
+                            </Link>
+                        );
+                    })}
+
+                    {/* PERFIL */}
+                    <Link
+                        to="/meu-perfil"
+                        className={`
+                        rounded-2xl transition-all hover:bg-fuchsia-50 hover:text-fuchsia-700
+                        ${menuAberto
+                                ? "px-5 py-4 flex items-center gap-3"
+                                : "flex justify-center py-4"
+                            }
+                    `}
+                    >
+                        <UserPen size={18} />
+                        {menuAberto && "Perfil"}
+                    </Link>
+
+                    {/* CONFIG */}
+                    {roleUsuario === "admin" && (
+                        <Link
+                            to="/configuracoes"
+                            className={`
+                            rounded-2xl transition-all hover:bg-fuchsia-50 hover:text-fuchsia-700
+                            ${menuAberto
+                                    ? "px-5 py-4 flex items-center gap-3"
+                                    : "flex justify-center py-4"
+                                }
+                        `}
+                        >
+                            <Settings size={18} />
+                            {menuAberto && "Configurações"}
+                        </Link>
+                    )}
+
+                </nav>
+
+                {/* RODAPÉ */}
+                <div className="p-6 border-t border-pink-100 flex items-center justify-between">
+                    <NotificationBell />
+                    <LogoutButton />
+                </div>
+
+            </aside>
+
+            {/* BOTÃO MOBILE */}
+            <button
+                onClick={() => setMenuAberto(!menuAberto)}
+                className="md:hidden fixed top-5 left-5 z-[60] bg-white text-rose-500 p-3 rounded-full shadow-lg border border-pink-100"
+            >
+                {menuAberto ? (
+                    <PanelLeftClose size={22} />
+                ) : (
+                    <PanelLeftOpen size={22} />
+                )}
+            </button>
+
+            {/* BOTÃO DESKTOP */}
+            <button
+                onClick={() => setMenuAberto(!menuAberto)}
+                className="hidden md:flex absolute top-1/2 left-[calc(theme(space.24))] -translate-y-1/2 z-40 bg-gradient-to-br from-pink-500 to-fuchsia-500 text-white p-2 rounded-r-xl shadow-lg"
+            >
+                {menuAberto ? (
+                    <PanelLeftClose size={18} />
+                ) : (
+                    <PanelLeftOpen size={18} />
+                )}
+            </button>
+
+            {/* CONTEÚDO PRINCIPAL */}
+            <div className="flex flex-col flex-1 min-w-0">
+
+                {/* TOPO */}
+                <header className="h-24 bg-white/70 backdrop-blur-xl border-b border-pink-100 shadow-sm flex items-center justify-between px-6 md:px-12">
+
+                    <div>
+                        <p className="uppercase tracking-[0.25em] text-xs text-fuchsia-500 font-semibold">
+                            Beleza • Estilo • Autoestima
+                        </p>
+
+                        <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-rose-600 via-pink-500 to-fuchsia-500 bg-clip-text text-transparent">
+                            Seu espaço de beleza profissional
+                        </h1>
+                    </div>
+
+                    <div className="hidden lg:block text-right">
+                        <p className="text-sm text-rose-400">
+                            Gestão elegante para negócios de beleza
+                        </p>
+                    </div>
+
+                </header>
+
+                {/* MAIN */}
+                <main className="flex-1 overflow-y-auto px-4 md:px-10 lg:px-16 py-8 pb-28">
+
+                    {/* HERO */}
+                    <section className="mb-10">
+                        <div className="relative overflow-hidden rounded-[2.5rem] bg-white border border-pink-100 shadow-xl">
+
+                            {/* DECORAÇÃO */}
+                            <div className="absolute top-0 right-0 w-80 h-80 bg-pink-100 rounded-full blur-3xl opacity-40"></div>
+                            <div className="absolute bottom-0 left-0 w-72 h-72 bg-fuchsia-100 rounded-full blur-3xl opacity-30"></div>
+
+                            <div className="relative z-10 p-8 md:p-14">
+
+                                <p className="uppercase tracking-[0.35em] text-sm text-rose-500 font-semibold mb-4">
+                                    Sofisticação para profissionais da beleza
+                                </p>
+
+                                <h2 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 bg-gradient-to-r from-rose-600 via-pink-500 to-fuchsia-500 bg-clip-text text-transparent">
+                                    Gestão refinada para salões, manicure e estética facial
+                                </h2>
+
+                                <p className="text-lg text-rose-700/80 max-w-3xl leading-relaxed">
+                                    Organize clientes, agendamentos, serviços, fidelização
+                                    e crescimento do seu negócio com uma experiência visual
+                                    luxuosa, feminina e moderna.
+                                </p>
+
+                            </div>
+
+                        </div>
+                    </section>
+
+                    {/* CONTEÚDO */}
+                    <section>
+                        {children}
+                    </section>
+
+                </main>
+
+                {/* MURAL */}
+                <MuralGlobal tenantNome={tenant.nome} />
+
+            </div>
+
+        </div>
+    );
+}
+
+export default LayoutBeleza;

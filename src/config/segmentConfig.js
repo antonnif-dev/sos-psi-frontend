@@ -16,6 +16,7 @@ export const segmentConfig = {
             sessao: "Sessão",
             prontuario: "Prontuário",
             documentos: "Documentos",
+            //mural: "Mural", #adcionar mural na página
             financeiro: "Financeiro",
             prescricoes: "Prescrições",
             notificacoes: "Notificações"
@@ -28,6 +29,7 @@ export const segmentConfig = {
             { label: "Sessões", path: "/sessoes" },
             { label: "Financeiro", path: "/financeiro" },
             { label: "Documentos", path: "/documentos" },
+            { label: "Mural", path: "/mural" },
             {
                 label: "Prontuário",
                 path: "/prontuario",

@@ -17,6 +17,7 @@ import PacientePerfil from "./pages/PacientePerfil";
 import Notificacoes from "./pages/Notificacoes";
 import SessoesRealizadas from "./pages/SessoesRealizadas";
 import MeuPerfil from "./pages/MeuPerfil";
+import MuralGlobal from "./pages/MuralGlobal";
 
 function App() {
     return (
@@ -104,7 +105,13 @@ function App() {
                                 <MapaEvolucao />
                             </DashboardLayout>
                         </PrivateRoute>} />
-
+                <Route path="/mural"
+                    element={
+                        <PrivateRoute>
+                            <DashboardLayout>
+                                <MuralGlobal />
+                            </DashboardLayout>
+                        </PrivateRoute>} />
                 <Route path="/prescricoes"
                     element={
                         <PrivateRoute>

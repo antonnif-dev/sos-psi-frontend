@@ -1,3 +1,4 @@
+//páginas exclusivas
 export const profissoesConfig = {
     //saude
     psicologo: {
