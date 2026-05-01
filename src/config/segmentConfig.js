@@ -16,7 +16,7 @@ export const segmentConfig = {
             sessao: "Sessão",
             prontuario: "Prontuário",
             documentos: "Documentos",
-            //mural: "Mural", #adcionar mural na página
+            mural: "Mural",
             financeiro: "Financeiro",
             prescricoes: "Prescrições",
             notificacoes: "Notificações"
@@ -35,12 +35,16 @@ export const segmentConfig = {
                 path: "/prontuario",
                 roles: ["admin", "psicologo"]
             },
-            { label: "Prescrições", path: "/prescricoes" }
+            {
+                label: "Prescrições",
+                path: "/prescricoes",
+                profissao: ["medico"]
+            },
         ]
     },
 
     // personal trainee, instrutor de pilates, intrutor de ioga, couches
-    estetica_corporal: {
+    estetica: {
         theme: {
             sidebar: "bg-emerald-700",
             topbar: "bg-white",
@@ -203,7 +207,7 @@ export const segmentConfig = {
     },
 
     // fotógrafos, videomaker
-    criativos: {
+    criativo: {
         theme: {
             sidebar: "bg-orange-600",
             topbar: "bg-white",

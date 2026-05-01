@@ -34,37 +34,7 @@ function LayoutCriativos({ children }) {
             <div className="flex flex-col flex-1 min-w-0">
 
                 {/* MAIN */}
-                <main className="flex-1 overflow-y-auto px-4 md:px-10 lg:px-16 py-8 pb-40">
-
-                    {/* HERO CRIATIVO */}
-                    <section className="mb-10">
-                        <div className="relative overflow-hidden rounded-[2.5rem] bg-white/5 border border-cyan-400/10 shadow-2xl backdrop-blur-md">
-
-                            {/* EFEITOS */}
-                            <div className="absolute top-0 right-0 w-80 h-80 bg-fuchsia-500/20 rounded-full blur-3xl"></div>
-                            <div className="absolute bottom-0 left-0 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl"></div>
-                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent"></div>
-
-                            <div className="relative z-10 p-8 md:p-14">
-
-                                <p className="uppercase tracking-[0.35em] text-sm text-cyan-300 font-semibold mb-4">
-                                    Produção • Imagem • Criatividade
-                                </p>
-
-                                <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 bg-gradient-to-r from-cyan-300 via-fuchsia-400 to-purple-400 bg-clip-text text-transparent">
-                                    Gestão criativa para profissionais visuais
-                                </h1>
-
-                                <p className="text-lg text-gray-300 max-w-3xl leading-relaxed">
-                                    Organize projetos, clientes, sessões, produções e entregas
-                                    com um painel ousado, moderno e pensado para criadores
-                                    de imagem, vídeo e experiências visuais.
-                                </p>
-
-                            </div>
-
-                        </div>
-                    </section>
+                <main className="flex-1 overflow-y-auto px-4 md:px-10 lg:px-16 py-8 pb-40">                    
 
                     {/* CONTEÚDO */}
                     <section>
@@ -72,11 +42,6 @@ function LayoutCriativos({ children }) {
                     </section>
 
                 </main>
-
-                {/* MURAL */}
-                <div className="pb-28">
-                    <MuralGlobal tenantNome={tenant.nome} />
-                </div>
 
                 {/* MENU INFERIOR */}
                 <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4">

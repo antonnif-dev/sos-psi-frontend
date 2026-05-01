@@ -1,7 +1,14 @@
 import { Link } from "react-router-dom";
 import LogoutButton from "../../components/LogoutButton";
 import { useState } from "react";
-import { PanelLeftClose, PanelLeftOpen, Settings, UserPen } from "lucide-react";
+import {
+    PanelLeftClose,
+    PanelLeftOpen,
+    Settings,
+    UserPen,
+    BriefcaseBusiness
+} from "lucide-react";
+
 import NotificationBell from "../../components/NotificationBell";
 import MuralGlobal from "../../components/MuralGlobal";
 
@@ -28,45 +35,67 @@ function LayoutJuridico({ children }) {
     };
 
     return (
-        <div className="flex h-screen relative">
+        <div className="flex h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-slate-100 relative overflow-hidden">
 
             {/* SIDEBAR */}
             <aside
                 className={`
-                    bg-gray-900 text-white transition-all duration-300 overflow-hidden
-                    ${menuAberto ? "w-36 md:w-56 p-5" : "w-0 p-0"}
+                    bg-slate-950/95 backdrop-blur-md border-r border-amber-500/10
+                    transition-all duration-300 overflow-hidden shadow-2xl
+                    ${menuAberto ? "w-40 md:w-72 p-6" : "w-0 p-0"}
                 `}
             >
-                <h2 className="text-xl font-bold mt-5 mb-20">
-                    {tenant.nome}
-                </h2>
+                {/* MARCA */}
+                <div className="flex items-center gap-4 mt-4 mb-14">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 flex items-center justify-center shadow-lg text-slate-900">
+                        <BriefcaseBusiness size={28} />
+                    </div>
 
-                <nav className="flex flex-col gap-4">
+                    <div>
+                        <h2 className="text-xl font-bold text-white leading-tight">
+                            {tenant.nome}
+                        </h2>
+                        <p className="text-sm text-amber-300">
+                            Gestão Jurídica & Consultiva
+                        </p>
+                    </div>
+                </div>
+
+                {/* MENU */}
+                <nav className="flex flex-col gap-3">
                     {config.menu.map((item) => {
-                        // controle de role opcional
                         if (item.roles && !item.roles.includes(roleUsuario)) {
                             return null;
                         }
 
                         return (
-                            <Link key={item.path} to={item.path}>
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className="px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition font-medium"
+                            >
                                 {item.label}
                             </Link>
                         );
                     })}
 
                     {/* PERFIL */}
-                    <Link to="/meu-perfil">
-                        <UserPen size={20} />
+                    <Link
+                        to="/meu-perfil"
+                        className="px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition flex items-center gap-3"
+                    >
+                        <UserPen size={18} />
+                        Perfil
                     </Link>
 
                     {/* CONFIG */}
                     {roleUsuario === "admin" && (
                         <Link
                             to="/configuracoes"
-                            className="flex justify-center mt-5"
+                            className="px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition flex items-center gap-3"
                         >
-                            <Settings size={20} />
+                            <Settings size={18} />
+                            Configurações
                         </Link>
                     )}
                 </nav>
@@ -75,41 +104,57 @@ function LayoutJuridico({ children }) {
             {/* BOTÃO MENU */}
             <button
                 onClick={() => setMenuAberto(!menuAberto)}
-                className="absolute top-1/2 -translate-y-1/2 bg-gray-900 text-white p-1 rounded-r-md shadow transition-all"
-                style={{ left: menuAberto ? "clamp(9rem, 20vw, 14rem)" : "0px" }}
+                className="absolute top-1/2 -translate-y-1/2 bg-slate-950 text-amber-300 p-2 rounded-r-xl shadow-lg border border-slate-700 transition-all z-50"
+                style={{
+                    left: menuAberto ? "clamp(10rem, 22vw, 18rem)" : "0px"
+                }}
             >
-                {menuAberto ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
+                {menuAberto ? (
+                    <PanelLeftClose size={18} />
+                ) : (
+                    <PanelLeftOpen size={18} />
+                )}
             </button>
 
             {/* CONTEÚDO */}
             <div className="flex flex-col flex-1 min-w-0">
 
                 {/* TOPBAR */}
-                <div className="h-20 bg-white border-b shadow-sm grid grid-cols-3 items-center px-6">
+                <header className="h-24 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-8 flex items-center justify-between">
 
-                    <div className="font-semibold">
-                        {tenant.nome}
+                    {/* EMPRESA */}
+                    <div>
+                        <h1 className="font-bold text-slate-800 text-xl">
+                            {tenant.nome}
+                        </h1>
+                        <p className="text-sm text-slate-500">
+                            Advocacia, contabilidade e consultoria estratégica
+                        </p>
                     </div>
 
-                    <div className="text-center font-medium">
-                        {getSaudacao()}, {tenant.usuario?.nome}
+                    {/* SAUDAÇÃO */}
+                    <div className="hidden md:block text-center">
+                        <p className="font-medium text-slate-700">
+                            {getSaudacao()}, {tenant.usuario?.nome}
+                        </p>
+                        <p className="text-sm text-slate-500">
+                            Excelência, estratégia e confiança
+                        </p>
                     </div>
 
-                    <div className="flex justify-end items-center gap-2">
+                    {/* AÇÕES */}
+                    <div className="flex items-center gap-4">
                         <NotificationBell />
-                        <div className="w-px h-6 bg-gray-300"></div>
+                        <div className="w-px h-6 bg-slate-300"></div>
                         <LogoutButton />
                     </div>
 
-                </div>
+                </header>
 
                 {/* MAIN */}
-                <main className="flex-1 bg-gray-100 p-8 overflow-y-auto pb-[20vh]">
+                <main className="flex-1 overflow-y-auto px-6 md:px-10 py-8 pb-[20vh] bg-gradient-to-b from-slate-100 to-slate-200">
                     {children}
                 </main>
-
-                {/* MURAL */}
-                <MuralGlobal tenantNome={tenant.nome} />
 
             </div>
         </div>

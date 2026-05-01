@@ -9,9 +9,18 @@ export function useSegment() {
     const config =
         segmentConfig[tenant.segmento] || segmentConfig.psicologia;
 
+    const filteredMenu = config.menu.filter((item) => {
+        // Se não tiver profissão definida, exibe normalmente
+        if (!item.profissao) return true;
+        
+        // Se profissão estiver definida, verifica se corresponde
+        return item.profissao.includes(tenant.profissao);
+        
+    });
+
     return {
         tenant,
         labels: config.labels,
-        menu: config.menu
+        menu: filteredMenu
     };
 }
