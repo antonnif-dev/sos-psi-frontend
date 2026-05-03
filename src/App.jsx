@@ -18,11 +18,55 @@ import Notificacoes from "./pages/Notificacoes";
 import SessoesRealizadas from "./pages/SessoesRealizadas";
 import MeuPerfil from "./pages/MeuPerfil";
 import MuralGlobal from "./pages/MuralGlobal";
+import RoleRoute from "./routes/RoleRoute";
+
+//estetica
+import AvaliacaoFisica from "./pages/estetica/AvaliacaoFisica";
+import Treinos from "./pages/estetica/Treinos";
+import Progresso from "./pages/estetica/Progresso";
+
+//estetica
+import Desempenho from "./pages/educacao/Desempenho";
+import PlanosAula from "./pages/educacao/PlanosAula";
+import Tarefas from "./pages/educacao/Tarefas";
+
+//profissionais
+import Prazos from "./pages/profissionais/Prazos";
+import Processos from "./pages/profissionais/Processos";
+import Relatorios from "./pages/profissionais/Relatorios";
+
+//beleza
+import AnamneseEstetica from "./pages/beleza/AnamneseEstetica";
+import AntesDepois from "./pages/beleza/AntesDepois";
+import Procedimentos from "./pages/beleza/Procedimentos";
+
+//criativos
+import Briefing from "./pages/criativo/Briefing";
+import Portfolio from "./pages/criativo/Portfolio";
+import Projetos from "./pages/criativo/Projetos";
+
+function ProtectedPage({ segments, profissoes, roles, children }) {
+    return (
+        <PrivateRoute>
+            <SegmentRoute allowedSegments={segments}>
+                <ProfissaoRoute allowedProfissoes={profissoes}>
+                    <RoleRoute allowedRoles={roles}>
+                        <DashboardLayout>
+                            {children}
+                        </DashboardLayout>
+                    </RoleRoute>
+                </ProfissaoRoute>
+            </SegmentRoute>
+        </PrivateRoute>
+    );
+}
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
+
+                {/* ---------------------------- Páginas Gerais ---------------------------- */}
                 <Route path="/" element={<Login />} />
                 <Route
                     path="/dashboard"
@@ -65,44 +109,11 @@ function App() {
                                 <Financeiro />
                             </DashboardLayout>
                         </PrivateRoute>} />
-
                 <Route path="/documentos"
                     element={
                         <PrivateRoute>
                             <DashboardLayout>
                                 <Documentos />
-                            </DashboardLayout>
-                        </PrivateRoute>} />
-                {/* 
-                <Route path="/prontuario"
-                    element={
-                        <PrivateRoute>
-                            <DashboardLayout>
-                                <Prontuario />
-                            </DashboardLayout>
-                        </PrivateRoute>} />
-*/}
-
-                {/* Prontuário exibido apenas para psicólogos e nutricionista*/}
-                <Route
-                    path="/prontuario"
-                    element={
-                        <PrivateRoute>
-                            <SegmentRoute allowedSegments={["saude"]}>
-                                <ProfissaoRoute allowedProfissoes={["psicologo", "nutricionista"]}>
-                                    <DashboardLayout>
-                                        <Prontuario />
-                                    </DashboardLayout>
-                                </ProfissaoRoute>
-                            </SegmentRoute>
-                        </PrivateRoute>
-                    }
-                />
-                <Route path="/mapa-evolucao"
-                    element={
-                        <PrivateRoute>
-                            <DashboardLayout>
-                                <MapaEvolucao />
                             </DashboardLayout>
                         </PrivateRoute>} />
                 <Route path="/mural"
@@ -112,27 +123,6 @@ function App() {
                                 <MuralGlobal />
                             </DashboardLayout>
                         </PrivateRoute>} />
-                <Route path="/prescricoes"
-                    element={
-                        <PrivateRoute>
-                            <DashboardLayout>
-                                <Prescrição />
-                            </DashboardLayout>
-                        </PrivateRoute>} />
-
-                {/* Exemplo de prescrição so para juridico
-                <Route
-                    path="/prescricoes"
-                    element={
-                        <SegmentRoute allowedSegments={["profissionais"]}>
-    <ProfissaoRoute allowedProfissoes={["advogado"]}>
-        <Prontuario />
-    </ProfissaoRoute>
-</SegmentRoute>
-                        </PrivateRoute>
-                    }
-                />
-                */}
                 <Route path="/configuracoes"
                     element={
                         <PrivateRoute>
@@ -161,6 +151,251 @@ function App() {
                                 <PacientePerfil />
                             </DashboardLayout>
                         </PrivateRoute>} />
+
+                {/* ---------------------------- Segmento saude ---------------------------- */}
+                {/* Prontuário exibido apenas para psicólogos e nutricionista*/}
+                <Route
+                    path="/prontuario"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["saude"]}>
+                                <ProfissaoRoute allowedProfissoes={["psicologo", "nutricionista"]}>
+                                    <DashboardLayout>
+                                        <Prontuario />
+                                    </DashboardLayout>
+                                </ProfissaoRoute>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/mapa-evolucao"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["saude"]}>
+                                <DashboardLayout>
+                                    <MapaEvolucao />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/prescricoes"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["saude"]}>
+                                <ProfissaoRoute allowedProfissoes={["medico"]}>
+                                    <DashboardLayout>
+                                        <Prescrição />
+                                    </DashboardLayout>
+                                </ProfissaoRoute>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                {/* ---------------------------- Segmento profissionais ---------------------------- */}
+                <Route
+                    path="/prazos"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["profissionais"]}>
+                                <DashboardLayout>
+                                    <Prazos />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/processos"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["profissionais"]}>
+                                <DashboardLayout>
+                                    <Processos />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/relatorios"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["profissionais"]}>
+                                <DashboardLayout>
+                                    <Relatorios />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                {/* ---------------------------- Segmento estetica ---------------------------- */}
+                <Route
+                    path="/avaliacao-fisica"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["estetica"]}>
+                                <DashboardLayout>
+                                    <AvaliacaoFisica />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/treinos"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["estetica"]}>
+                                <DashboardLayout>
+                                    <Treinos />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/progresso"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["estetica"]}>
+                                <DashboardLayout>
+                                    <Progresso />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                {/* ---------------------------- Segmento educacao ---------------------------- */}
+
+                <Route
+                    path="/desempenho"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["educacao"]}>
+                                <DashboardLayout>
+                                    <Desempenho />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/planos-aula"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["educacao"]}>
+                                <DashboardLayout>
+                                    <PlanosAula />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/tarefas"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["educacao"]}>
+                                <DashboardLayout>
+                                    <Tarefas />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                {/* ---------------------------- Segmento beleza ---------------------------- */}
+                <Route
+                    path="/anamnese-estetica"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["beleza"]}>
+                                <DashboardLayout>
+                                    <AnamneseEstetica />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/antes-depois"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["beleza"]}>
+                                <DashboardLayout>
+                                    <AntesDepois />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/procedimentos"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["beleza"]}>
+                                <DashboardLayout>
+                                    <Procedimentos />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                {/* ---------------------------- Segmento criativos ---------------------------- */}
+                <Route
+                    path="/briefing"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["criativo"]}>
+                                <DashboardLayout>
+                                    <Briefing />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/portfolio"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["criativo"]}>
+                                <DashboardLayout>
+                                    <Portfolio />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/projetos"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["criativo"]}>
+                                <DashboardLayout>
+                                    <Projetos />
+                                </DashboardLayout>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+
             </Routes>
         </BrowserRouter>
     );

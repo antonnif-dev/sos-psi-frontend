@@ -14,11 +14,17 @@ import MuralGlobal from "../../components/MuralGlobal";
 
 import { useTenant } from "../../hooks/useTenant";
 import { segmentConfig } from "../../config/segmentConfig";
+import { useSegment } from "../../hooks/useSegment";
 
 function LayoutEstetica({ children }) {
     const [menuAberto, setMenuAberto] = useState(true);
 
     const tenant = useTenant();
+    const {
+        labels,
+        menu,
+        theme
+    } = useSegment();
 
     if (!tenant) return null;
 
@@ -58,7 +64,7 @@ function LayoutEstetica({ children }) {
 
                 {/* MENU */}
                 <nav className="flex items-center gap-6">
-                    {config.menu.map((item) => {
+                    {menu.map((item) => {
                         if (item.roles && !item.roles.includes(roleUsuario)) {
                             return null;
                         }
@@ -100,15 +106,15 @@ function LayoutEstetica({ children }) {
                     className="fixed top-5 right-5 z-50 bg-white text-emerald-600 p-3 rounded-full shadow-lg border border-emerald-100"
                 >
                     {menuAberto ? (
-                        <PanelLeftClose size={22} />
-                    ) : (
                         <PanelLeftOpen size={22} />
+                    ) : (
+                        <PanelLeftClose size={22} />
                     )}
                 </button>
 
                 <aside
                     className={`
-                    fixed top-0 right-0 h-full w-72 bg-white text-slate-700 z-40
+                    fixed top-0 right-0 h-full w-44 bg-white text-slate-700 z-40
                     transition-transform duration-300 shadow-2xl border-l border-emerald-100
                     ${menuAberto ? "translate-x-0" : "translate-x-full"}
                 `}
@@ -127,7 +133,7 @@ function LayoutEstetica({ children }) {
                         </p>
                     </div>
 
-                    <nav className="flex flex-col gap-3 p-6">
+                    <nav className="flex flex-col p-4">
                         {config.menu.map((item) => {
                             if (item.roles && !item.roles.includes(roleUsuario)) {
                                 return null;
@@ -188,9 +194,9 @@ function LayoutEstetica({ children }) {
                     </p>
                 </div>
 
-                {/* AÇÕES */}
+                {/* Notificação para cima */}
                 <div className="flex items-center gap-4">
-                    <NotificationBell />
+                    <NotificationBell dropdownPosition="top" />
                     <div className="w-px h-6 bg-emerald-200"></div>
                     <LogoutButton />
                 </div>

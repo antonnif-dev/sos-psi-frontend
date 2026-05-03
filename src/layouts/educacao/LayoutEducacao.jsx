@@ -14,11 +14,17 @@ import MuralGlobal from "../../components/MuralGlobal";
 
 import { useTenant } from "../../hooks/useTenant";
 import { segmentConfig } from "../../config/segmentConfig";
+import { useSegment } from "../../hooks/useSegment";
 
 function LayoutEducacao({ children }) {
     const [menuAberto, setMenuAberto] = useState(true);
 
     const tenant = useTenant();
+    const {
+        labels,
+        menu,
+        theme
+    } = useSegment();
 
     if (!tenant) return null;
 
@@ -44,38 +50,11 @@ function LayoutEducacao({ children }) {
                 bg-white/95 backdrop-blur-xl border-r border-indigo-100 shadow-2xl
                 transition-all duration-300 flex flex-col
                 ${menuAberto
-                        ? "w-80 translate-x-0"
+                        ? "w-44 md:52 lg:w-72 translate-x-0"
                         : "w-0 md:w-24 -translate-x-full md:translate-x-0 overflow-hidden"}
             `}
             >
-
-                {/* HEADER */}
-                <div className="p-6 md:p-8 border-b border-indigo-100">
-
-                    {menuAberto && (
-                        <>
-                            <div className="flex gap-2">
-                                <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-blue-500 via-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-lg mb-5">
-                                    <GraduationCap size={30} />
-                                </div>
-                                <div>
-                                    <h2 className="text-2xl font-bold text-indigo-800">
-                                        {tenant.nome}
-                                    </h2>
-
-                                    <p className="text-sm text-slate-500 mt-2 leading-relaxed">
-                                        Plataforma premium para professores, mentores,
-                                        educadores e desenvolvimento acadêmico.
-                                    </p>
-                                </div>
-                            </div>
-                        </>
-                    )}
-
-                </div>
-
-                {/* SAUDAÇÃO *** esconder para telas grandes */}
-                <div className="p-6 md:p-8 border-b border-indigo-100 ">
+                <div className="p-6 md:p-10 lg:p-14 border-b border-indigo-100 ">
                     {menuAberto ? (
                         <>
                             <p className="uppercase tracking-[0.25em] text-xs font-semibold text-violet-500 mb-3">
@@ -88,8 +67,7 @@ function LayoutEducacao({ children }) {
                             </h3>
 
                             <p className="text-sm text-slate-500">
-                                Organize alunos, conteúdos, cronogramas e
-                                transforme jornadas de aprendizado.
+                                Organize seu dia a dia.
                             </p>
                         </>
                     ) : (
@@ -101,9 +79,9 @@ function LayoutEducacao({ children }) {
                 </div>
 
                 {/* MENU */}
-                <nav className="flex-1 p-4 md:p-6 flex flex-col gap-3 overflow-y-auto">
+                <nav className="flex-1 p-4 md:p-6 flex flex-col overflow-y-auto">
 
-                    {config.menu.map((item) => {
+                    {menu.map((item) => {
                         if (item.roles && !item.roles.includes(roleUsuario)) {
                             return null;
                         }
@@ -157,18 +135,15 @@ function LayoutEducacao({ children }) {
 
                 </nav>
 
-                {/* RODAPÉ */}
-                <div className="p-6 border-t border-indigo-100 flex items-center justify-between">
-                    <NotificationBell />
-                    <LogoutButton />
-                </div>
-
             </aside>
 
             {/* BOTÃO MOBILE */}
             <button
                 onClick={() => setMenuAberto(!menuAberto)}
-                className="md:hidden fixed top-5 left-5 z-[60] bg-white text-indigo-600 p-3 rounded-full shadow-lg border border-indigo-100"
+                className={`
+                md:hidden fixed top-16 z-[60] bg-white text-indigo-600 p-3 rounded-full shadow-lg border border-indigo-100 transition-all duration-300
+                ${menuAberto ? "left-40" : "left-5"}
+                `}
             >
                 {menuAberto ? (
                     <PanelLeftClose size={22} />
@@ -190,10 +165,42 @@ function LayoutEducacao({ children }) {
             </button>
 
             {/* CONTEÚDO PRINCIPAL */}
-            <div className="flex flex-col flex-1 min-w-0">
+            <div
+                className={`
+    flex flex-col flex-1 min-w-0 transition-all duration-300
+    ${menuAberto ? "ml-52 md:ml-0" : "ml-0"}
+  `}
+            >
+                {/* HEADER DESKTOP */}
+                <div className="relative z-40 flex items-center justify-between px-4 md:px-10 lg:px-16 py-4 md:py-6 border-b border-indigo-100 bg-white/95 backdrop-blur-xl">
+
+                    <div className="flex gap-3 md:gap-4 items-center">
+                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-3xl bg-gradient-to-br from-blue-500 via-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-lg">
+                            <GraduationCap size={22} className="md:w-[30px] md:h-[30px]" />
+                        </div>
+
+                        <div>
+                            <h2 className="text-lg md:text-2xl font-bold text-indigo-800">
+                                {tenant.nome}
+                            </h2>
+
+                            <p className="hidden sm:block text-sm text-slate-500 mt-1 leading-relaxed">
+                                Plataforma premium para professores, mentores,
+                                educadores e desenvolvimento acadêmico.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 md:gap-4">
+                        <NotificationBell dropdownPosition="top" />
+                        <div className="w-px h-6 bg-indigo-200"></div>
+                        <LogoutButton />
+                    </div>
+
+                </div>
 
                 {/* MAIN */}
-                <main className="flex-1 overflow-y-auto px-4 md:px-10 lg:px-16 py-8 pb-28">
+                <main className="flex-1 overflow-y-auto px-4 md:px-10 lg:px-16 py-10 md:py-8 pb-28">
 
                     {/* CONTEÚDO */}
                     <section>

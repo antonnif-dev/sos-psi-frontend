@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { getNotificacoes, markAsRead } from "../services/notificacoesService";
 import { useNavigate } from "react-router-dom";
 
-export default function NotificationDropdown({ open, onClose }) {
+export default function NotificationDropdown({
+  open,
+  onClose,
+  position = "bottom"
+}) {
   const [notificacoes, setNotificacoes] = useState([])
   const navigate = useNavigate()
 
@@ -28,8 +32,15 @@ export default function NotificationDropdown({ open, onClose }) {
     onClose()
   }
 
+  const positionClass = {
+    "bottom-right": "absolute right-0 top-12",
+    "bottom-left": "absolute left-0 top-12",
+    "top-right": "absolute right-0 bottom-12",
+    "top-left": "absolute left-0 bottom-12",
+  }[position] || "absolute right-0 top-12";
+
   return (
-    <div className="absolute right-0 top-12 w-80 bg-white shadow-lg rounded-lg z-50 text-black">
+    <div className={`${positionClass} w-80 bg-white shadow-lg rounded-lg z-[9999] text-black`}>
       {notificacoes.length === 0 && (
         <div className="p-4 text-sm text-gray-500">
           Nenhuma notificação

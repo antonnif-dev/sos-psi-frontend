@@ -14,11 +14,16 @@ import MuralGlobal from "../../components/MuralGlobal";
 
 import { useTenant } from "../../hooks/useTenant";
 import { segmentConfig } from "../../config/segmentConfig";
+import { useSegment } from "../../hooks/useSegment";
 
 function LayoutJuridico({ children }) {
     const [menuAberto, setMenuAberto] = useState(true);
-
     const tenant = useTenant();
+    const {
+        labels,
+        menu,
+        theme
+    } = useSegment();
 
     if (!tenant) return null;
 
@@ -42,28 +47,25 @@ function LayoutJuridico({ children }) {
                 className={`
                     bg-slate-950/95 backdrop-blur-md border-r border-amber-500/10
                     transition-all duration-300 overflow-hidden shadow-2xl
-                    ${menuAberto ? "w-40 md:w-72 p-6" : "w-0 p-0"}
+                    ${menuAberto ? "w-48 md:w-72 p-6" : "w-0 p-0"}
                 `}
             >
                 {/* MARCA */}
-                <div className="flex items-center gap-4 mt-4 mb-14">
+                <div className="flex flex-col items-center gap-4 mt-4 mb-8">
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 flex items-center justify-center shadow-lg text-slate-900">
                         <BriefcaseBusiness size={28} />
                     </div>
-
-                    <div>
-                        <h2 className="text-xl font-bold text-white leading-tight">
-                            {tenant.nome}
-                        </h2>
-                        <p className="text-sm text-amber-300">
-                            Gestão Jurídica & Consultiva
-                        </p>
-                    </div>
+                    <h2 className="text-xl font-bold text-white leading-tight">
+                        {tenant.nome}
+                    </h2>
+                    <p className="text-sm text-amber-300">
+                        Gestão Jurídica & Consultiva
+                    </p>
                 </div>
 
                 {/* MENU */}
                 <nav className="flex flex-col gap-3">
-                    {config.menu.map((item) => {
+                    {menu.map((item) => {
                         if (item.roles && !item.roles.includes(roleUsuario)) {
                             return null;
                         }
@@ -104,7 +106,7 @@ function LayoutJuridico({ children }) {
             {/* BOTÃO MENU */}
             <button
                 onClick={() => setMenuAberto(!menuAberto)}
-                className="absolute top-1/2 -translate-y-1/2 bg-slate-950 text-amber-300 p-2 rounded-r-xl shadow-lg border border-slate-700 transition-all z-50"
+                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/5 lg:-translate-x-1/5 bg-slate-950 text-amber-300 p-2 rounded-r-xl shadow-lg border border-slate-700 transition-all z-50"
                 style={{
                     left: menuAberto ? "clamp(10rem, 22vw, 18rem)" : "0px"
                 }}
@@ -120,7 +122,7 @@ function LayoutJuridico({ children }) {
             <div className="flex flex-col flex-1 min-w-0">
 
                 {/* TOPBAR */}
-                <header className="h-24 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-8 flex items-center justify-between">
+                <header className="h-32 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-8 flex items-center justify-between">
 
                     {/* EMPRESA */}
                     <div>

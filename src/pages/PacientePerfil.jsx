@@ -5,6 +5,7 @@ import { listarObservacoes, criarObservacao } from "../services/observacoesServi
 import Card from "../components/Card";
 import { auth } from "../services/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { useSegment } from "../hooks/useSegment";
 
 function PacientePerfil() {
     const { id } = useParams();
@@ -12,6 +13,11 @@ function PacientePerfil() {
     const [paciente, setPaciente] = useState(null);
     const [observacoes, setObservacoes] = useState([]);
     const [novaObs, setNovaObs] = useState("");
+
+    const segment = useSegment();
+    const labels = segment.labels;
+    const tenantId = segment.tenant?.id;
+    //const tenantId = tenant?.id;
 
     // observar autenticação
     useEffect(() => {
@@ -30,21 +36,25 @@ function PacientePerfil() {
 
     // carregar paciente quando user estiver definido
     useEffect(() => {
-        if (!user) return;
+        if (!user || !tenantId) return;
+
         async function carregarPaciente() {
             try {
-                const data = await listarPacientes();
+                const data = await listarPacientes(tenantId);
                 const p = data.find(p => p.id === id);
+
                 setPaciente(p || {});
-                const obs = await listarObservacoes("tenant1", id); //mudar depois para outras tenants
+
+                const obs = await listarObservacoes(tenantId, id);
                 setObservacoes(obs);
 
             } catch (err) {
                 console.error("ERRO:", err);
             }
         }
+
         carregarPaciente();
-    }, [user, id]);
+    }, [user, id, tenantId]);
 
     if (!user) return <p>Carregando usuário...</p>;
     if (!paciente) return <p>Carregando paciente...</p>;
@@ -52,10 +62,13 @@ function PacientePerfil() {
     const endereco = paciente.endereco || {};
 
     async function salvarObservacao() {
-        if (!novaObs.trim()) return;
-        await criarObservacao("tenant1", id, novaObs);
-        const obs = await listarObservacoes("tenant1", id); //mudar depois para outras tenants
+        if (!novaObs.trim() || !tenantId) return;
+
+        await criarObservacao(tenantId, id, novaObs);
+
+        const obs = await listarObservacoes(tenantId, id);
         setObservacoes(obs);
+
         setNovaObs("");
     }
 
@@ -100,7 +113,7 @@ function PacientePerfil() {
             </Card>
 
             <Card>
-                <h2 className="font-semibold mb-2">Observações Iniciais</h2>
+                <h2 className="font-semibold mb-2">{labels.observacoes} Iniciais</h2>
                 <p className="text-sm text-gray-600">
                     {paciente.observacoesIniciais || "Sem observações iniciais"}
                 </p>
@@ -108,7 +121,7 @@ function PacientePerfil() {
 
             <h2>Espaço para adcionar novas observações</h2>
             <Card>
-                <h2 className="font-semibold mb-3">Observações Clínicas</h2>
+                <h2 className="font-semibold mb-3">{labels.observacoes} Clínicas</h2>
 
                 {observacoes.length > 0 ? (
                     <div className="space-y-3">
@@ -120,7 +133,7 @@ function PacientePerfil() {
                         ))}
                     </div>
                 ) : (
-                    <p className="text-sm text-gray-500">Nenhuma observação registrada.</p>
+                    <p className="text-sm text-gray-500">Nenhuma {labels.observacao} registrada.</p>
                 )}
 
                 <div className="mt-4">
@@ -135,7 +148,7 @@ function PacientePerfil() {
                         onClick={salvarObservacao}
                         className="mt-2 bg-blue-600 text-white px-4 py-2 rounded text-sm"
                     >
-                        Salvar Observação
+                        Salvar {labels.observacao}
                     </button>
                 </div>
             </Card>

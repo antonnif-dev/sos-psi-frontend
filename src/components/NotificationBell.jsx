@@ -3,10 +3,10 @@ import { Bell } from "lucide-react"
 import { getUnreadCount } from "../services/notificacoesService"
 import NotificationDropdown from "./NotificationDropdown"
 
-export default function NotificationBell() {
+export default function NotificationBell({ dropdownPosition = "bottom" }) {
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(0);
-  
+
   async function loadCount() {
     const c = await getUnreadCount()
     setCount(c)
@@ -35,6 +35,7 @@ export default function NotificationBell() {
       <NotificationDropdown
         open={open}
         onClose={() => setOpen(false)}
+        position={dropdownPosition}
       />
     </div>
   )

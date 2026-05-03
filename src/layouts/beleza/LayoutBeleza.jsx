@@ -14,12 +14,17 @@ import MuralGlobal from "../../components/MuralGlobal";
 
 import { useTenant } from "../../hooks/useTenant";
 import { segmentConfig } from "../../config/segmentConfig";
+import { useSegment } from "../../hooks/useSegment";
 
 function LayoutBeleza({ children }) {
-    const [menuAberto, setMenuAberto] = useState(true);
+    const [menuAberto, setMenuAberto] = useState(false);
 
     const tenant = useTenant();
-
+    const {
+        labels,
+        menu,
+        theme
+    } = useSegment();
     if (!tenant) return null;
 
     const config =
@@ -40,12 +45,10 @@ function LayoutBeleza({ children }) {
             {/* SIDEBAR ESQUERDA */}
             <aside
                 className={`
-                fixed md:relative top-0 left-0 h-full z-50
+                hidden md:flex md:relative top-0 left-0 h-full z-50
                 bg-white/90 backdrop-blur-2xl border-r border-pink-100 shadow-2xl
-                transition-all duration-300 flex flex-col
-                ${menuAberto
-                        ? "w-80 translate-x-0"
-                        : "w-0 md:w-24 -translate-x-full md:translate-x-0 overflow-hidden"}
+                transition-all duration-300 flex-col
+                ${menuAberto ? "md:w-80" : "md:w-24"}
             `}
             >
 
@@ -61,11 +64,6 @@ function LayoutBeleza({ children }) {
                             <h2 className="text-2xl font-bold text-rose-700">
                                 {tenant.nome}
                             </h2>
-
-                            <p className="text-sm text-rose-400 mt-2 leading-relaxed">
-                                Plataforma premium para estética, beleza,
-                                autocuidado e experiências sofisticadas.
-                            </p>
                         </>
                     )}
 
@@ -83,11 +81,6 @@ function LayoutBeleza({ children }) {
                             <h3 className="text-2xl font-bold text-rose-800 leading-tight mb-3">
                                 {getSaudacao()}, {tenant.usuario?.nome}
                             </h3>
-
-                            <p className="text-sm text-rose-400">
-                                Encante clientes, organize atendimentos e
-                                eleve sua marca de beleza com excelência.
-                            </p>
                         </>
                     ) : (
                         <div className="flex justify-center text-fuchsia-500">
@@ -100,7 +93,7 @@ function LayoutBeleza({ children }) {
                 {/* MENU */}
                 <nav className="flex-1 p-4 md:p-6 flex flex-col gap-3 overflow-y-auto">
 
-                    {config.menu.map((item) => {
+                    {menu.map((item) => {
                         if (item.roles && !item.roles.includes(roleUsuario)) {
                             return null;
                         }
@@ -162,17 +155,59 @@ function LayoutBeleza({ children }) {
 
             </aside>
 
-            {/* BOTÃO MOBILE */}
-            <button
-                onClick={() => setMenuAberto(!menuAberto)}
-                className="md:hidden fixed top-5 left-5 z-[60] bg-white text-rose-500 p-3 rounded-full shadow-lg border border-pink-100"
-            >
-                {menuAberto ? (
-                    <PanelLeftClose size={22} />
-                ) : (
+            {/* MENU MOBILE */}
+            <div className="md:hidden fixed top-8 left-3 z-[70]">
+                <button
+                    onClick={() => setMenuAberto(!menuAberto)}
+                    className="bg-white text-rose-500 p-3 rounded-full shadow-lg border border-pink-100"
+                >
                     <PanelLeftOpen size={22} />
+                </button>
+
+                {menuAberto && (
+                    <div className="absolute top-16 left-0 w-64 bg-white rounded-3xl shadow-2xl border border-pink-100 p-4 flex flex-col gap-2">
+
+                        {menu.map((item) => {
+                            if (item.roles && !item.roles.includes(roleUsuario)) return null;
+
+                            return (
+                                <Link
+                                    key={item.path}
+                                    to={item.path}
+                                    onClick={() => setMenuAberto(false)}
+                                    className="px-4 py-3 rounded-2xl hover:bg-pink-50 hover:text-rose-700 transition-all"
+                                >
+                                    {item.label}
+                                </Link>
+                            );
+                        })}
+
+                        <Link
+                            to="/meu-perfil"
+                            onClick={() => setMenuAberto(false)}
+                            className="px-4 py-3 rounded-2xl hover:bg-fuchsia-50"
+                        >
+                            Perfil
+                        </Link>
+
+                        {roleUsuario === "admin" && (
+                            <Link
+                                to="/configuracoes"
+                                onClick={() => setMenuAberto(false)}
+                                className="px-4 py-3 rounded-2xl hover:bg-fuchsia-50"
+                            >
+                                Configurações
+                            </Link>
+                        )}
+
+                        <div className="border-t border-pink-100 pt-3 mt-2 flex items-center justify-between">
+                            <NotificationBell dropdownPosition="bottom-left" />
+                            <LogoutButton />
+                        </div>
+
+                    </div>
                 )}
-            </button>
+            </div>
 
             {/* BOTÃO DESKTOP */}
             <button
@@ -190,12 +225,26 @@ function LayoutBeleza({ children }) {
             <div className="flex flex-col flex-1 min-w-0">
 
                 {/* TOPO */}
-                <header className="h-24 bg-white/70 backdrop-blur-xl border-b border-pink-100 shadow-sm flex items-center justify-between px-6 md:px-12">
+                <header className="h-32 pl-24 md:pl-12 bg-white/70 backdrop-blur-xl border-b border-pink-100 shadow-sm flex items-center justify-between px-6 md:px-12">
 
                     <div>
-                        <p className="uppercase tracking-[0.25em] text-xs text-fuchsia-500 font-semibold">
-                            Beleza • Estilo • Autoestima
-                        </p>
+                        {/* MOBILE */}
+                        <div className="md:hidden">
+                            <p className="uppercase tracking-[0.25em] text-[10px] text-fuchsia-500 font-semibold mb-1">
+                                Beleza, autoestima e sofisticação
+                            </p>
+
+                            <h3 className="text-lg font-bold text-rose-800 leading-tight">
+                                {getSaudacao()}, {tenant.usuario?.nome}
+                            </h3>
+                        </div>
+
+                        {/* DESKTOP */}
+                        <div className="hidden md:block">
+                            <p className="uppercase tracking-[0.25em] text-xs text-fuchsia-500 font-semibold">
+                                Beleza • Estilo • Autoestima
+                            </p>
+                        </div>
                     </div>
 
                     <div className="hidden lg:block text-right">

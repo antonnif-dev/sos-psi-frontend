@@ -4,23 +4,44 @@ import { segmentConfig } from "../config/segmentConfig";
 export function useSegment() {
     const tenant = useTenant();
 
-    if (!tenant) return {};
+    if (!tenant) {
+        console.log("Tenant não carregada.");
+
+        return {
+            tenant: null,
+            labels: {},
+            menu: [],
+            theme: {}
+        };
+    }
+
+    console.log("Tenant carregada:", tenant);
 
     const config =
-        segmentConfig[tenant.segmento] || segmentConfig.psicologia;
+        segmentConfig[tenant.segmento] || segmentConfig.saude;
+
+    console.log("Configuração do segmento:", config);
 
     const filteredMenu = config.menu.filter((item) => {
-        // Se não tiver profissão definida, exibe normalmente
-        if (!item.profissao) return true;
-        
-        // Se profissão estiver definida, verifica se corresponde
-        return item.profissao.includes(tenant.profissao);
-        
+        console.log("Analisando item:", item);
+
+        const profissaoOk =
+            !item.profissoes ||
+            item.profissoes.includes(tenant.profissao);
+
+        console.log("tenant.profissao:", tenant.profissao);
+        console.log("item.profissoes:", item.profissoes);
+        console.log("profissaoOk:", profissaoOk);
+
+        return profissaoOk;
     });
+
+    console.log("Menu final filtrado:", filteredMenu);
 
     return {
         tenant,
         labels: config.labels,
-        menu: filteredMenu
+        menu: filteredMenu,
+        theme: config.theme
     };
 }

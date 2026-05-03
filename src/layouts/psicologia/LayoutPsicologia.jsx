@@ -5,10 +5,16 @@ import NotificationBell from "../../components/NotificationBell";
 import MuralGlobal from "../../components/MuralGlobal";
 
 import { useTenant } from "../../hooks/useTenant";
+import { useSegment } from "../../hooks/useSegment";
 import { segmentConfig } from "../../config/segmentConfig";
 
 function LayoutPsicologia({ children }) {
     const tenant = useTenant();
+    const {
+        labels,
+        menu,
+        theme
+    } = useSegment();
 
     if (!tenant) return null;
 
@@ -85,7 +91,7 @@ function LayoutPsicologia({ children }) {
 
                     <div className="flex justify-center items-center flex-wrap gap-3 lg:gap-4">
 
-                        {config.menu.map((item) => {
+                        {menu.map((item) => {
                             if (item.roles && !item.roles.includes(roleUsuario)) {
                                 return null;
                             }
