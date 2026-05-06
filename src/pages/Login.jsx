@@ -64,7 +64,7 @@ function Login() {
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
-          className="w-full px-6 py-12 sm:px-10 lg:px-16 xl:px-20 flex flex-col justify-center space-y-10"
+          className="w-full px-6 py-8 sm:px-10 lg:px-16 xl:px-20 flex flex-col justify-center space-y-10"
         >
           <div className="space-y-6">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl text-center lg:text-left font-extrabold text-indigo-700 leading-tight">
@@ -129,7 +129,7 @@ function Login() {
           </div>
 
           {/* Benefits Section */}
-          <div className="grid grid-cols-1 items-center gap-5">
+          <div className="grid grid-cols-1 items-center gap-4">
             {[
               "Agenda inteligente com notificações",
               "Prontuários digitais seguros",
@@ -181,7 +181,7 @@ function Login() {
         </motion.section>
 
         {/* Right Column */}
-        <section className="w-full flex flex-col justify-around px-6 py-10 sm:px-10 lg:px-12 bg-white shadow-inner">
+        <section className="w-full flex flex-col justify-around px-6 space-y-10 sm:px-10 lg:px-12 bg-white shadow-inner">
 
           {/* Login Form */}
           <motion.div

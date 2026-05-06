@@ -6,12 +6,13 @@ import LayoutEducacao from "./educacao/LayoutEducacao";
 import LayoutBeleza from "./beleza/LayoutBeleza";
 import LayoutEstetica from "./estetica/LayoutEstetica";
 import LayoutCriativo from "./criativos/LayoutCriativos";
+import DashboardLoading from "../components/DashboardLoading";
 
 function DashboardLayout({ children }) {
     const tenant = useTenant();
 
     if (!tenant || !tenant.segmento) {
-        return <div>Carregando...</div>;
+        return <DashboardLoading />;
     }
 
     const layouts = {
