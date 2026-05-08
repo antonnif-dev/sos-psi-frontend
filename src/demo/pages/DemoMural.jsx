@@ -1,79 +1,115 @@
-import MuralGlobal from "../../components/MuralGlobal";
+import { useEffect, useState } from "react";
+
+import {
+    listarMensagensMock
+} from "../services/muralDemoService";
+
+function tempoRelativo(data) {
+
+    const agora = new Date();
+
+    const diff =
+        Math.floor(
+            (agora - new Date(data)) / 1000 / 60
+        );
+
+    if (diff < 1) return "Agora";
+
+    if (diff < 60) {
+        return `${diff} min atrás`;
+    }
+
+    const horas =
+        Math.floor(diff / 60);
+
+    if (horas < 24) {
+        return `${horas}h atrás`;
+    }
+
+    const dias =
+        Math.floor(horas / 24);
+
+    return `${dias}d atrás`;
+
+}
 
 export default function DemoMural() {
 
-    const mensagensMock = [
+    const [mensagens, setMensagens] =
+        useState([]);
 
-        {
-            id: 1,
-            autor: "Dra. Fernanda Lima",
-            tenantNome: "Clínica Bem Viver",
-            mensagem:
-                "Alguém utiliza confirmação automática de sessões por WhatsApp?",
-            createdAt: new Date()
-        },
+    useEffect(() => {
 
-        {
-            id: 2,
-            autor: "Dr. Carlos Henrique",
-            tenantNome: "Instituto Equilíbrio",
-            mensagem:
-                "Reduzimos faltas em quase 40% usando lembretes automáticos.",
-            createdAt: new Date(
-                Date.now() - 1000 * 60 * 12
-            )
-        },
+        const dados =
+            listarMensagensMock();
 
-        {
-            id: 3,
-            autor: "Patrícia Alves",
-            tenantNome: "Espaço Mente Leve",
-            mensagem:
-                "O mapa de evolução está ajudando bastante nas devolutivas clínicas.",
-            createdAt: new Date(
-                Date.now() - 1000 * 60 * 35
-            )
-        },
+        setMensagens(dados);
 
-        {
-            id: 4,
-            autor: "Ana Clara",
-            tenantNome: "Centro Vida Psi",
-            mensagem:
-                "Vocês registram escalas emocionais em todas as sessões?",
-            createdAt: new Date(
-                Date.now() - 1000 * 60 * 55
-            )
-        },
-
-        {
-            id: 5,
-            autor: "João Pedro",
-            tenantNome: "Clínica Horizonte",
-            mensagem:
-                "Começamos a utilizar prontuário digital compartilhado e a equipe adorou.",
-            createdAt: new Date(
-                Date.now() - 1000 * 60 * 90
-            )
-        }
-
-    ];
+    }, []);
 
     return (
 
         <div className="min-h-screen p-6 bg-gray-100">
 
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-5xl mx-auto">
 
-                <h1 className="text-2xl font-bold mb-6">
-                    Mural
-                </h1>
+                <div className="mb-6">
 
-                <MuralGlobal
-                    tenantNome="SOS Organização"
-                    expandidoPadrao={true}
-                    mensagensMock={mensagensMock}
-                />
+                    <h1 className="text-2xl font-bold">
+                        Mural
+                    </h1>
+
+                    <p className="text-sm text-gray-500 mt-1">
+                        Discussões e compartilhamentos entre clínicas e profissionais.
+                    </p>
+
+                </div>
+
+                <div className="space-y-4">
+
+                    {mensagens.map((msg) => (
+
+                        <div
+                            key={msg.id}
+                            className="
+                                bg-white
+                                rounded-xl
+                                border
+                                border-gray-200
+                                p-5
+                                shadow-sm
+                            "
+                        >
+
+                            <div className="flex items-center justify-between mb-3">
+
+                                <div>
+
+                                    <h2 className="font-semibold text-gray-800">
+                                        {msg.autor}
+                                    </h2>
+
+                                    <p className="text-sm text-indigo-600">
+                                        {msg.tenantNome}
+                                    </p>
+
+                                </div>
+
+                                <span className="text-xs text-gray-400">
+                                    {tempoRelativo(msg.createdAt)}
+                                </span>
+
+                            </div>
+
+                            <p className="text-gray-700 leading-relaxed">
+                                {msg.mensagem}
+                            </p>
+
+                        </div>
+
+                    ))}
+
+                </div>
 
             </div>
 
