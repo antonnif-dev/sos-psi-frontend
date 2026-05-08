@@ -10,7 +10,7 @@ import Card from "../../components/Card";
 import { useNavigate } from "react-router-dom";
 import { useSegment } from "../../hooks/useSegment";
 
-function DemoPacientes() {
+function DemoPaciente() {
     const [pacientes, setPacientes] = useState([]);
     const [busca, setBusca] = useState("");
     const navigate = useNavigate();
@@ -527,4 +527,4 @@ function DemoPacientes() {
     );
 }
 
-export default DemoPacientes;
+export default DemoPaciente;
