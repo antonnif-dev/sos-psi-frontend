@@ -40,7 +40,7 @@ function AppDemo() {
                 path="pacientes"
                 element={
                     <DemoDashboardLayout>
-                        <DemoPacientes />
+                        <DemoPaciente />
                     </DemoDashboardLayout>
                 }
             />
