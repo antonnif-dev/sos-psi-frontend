@@ -30,6 +30,8 @@ export default function MeuPerfil() {
         senha: "",
         telefone: "",
         profissionalId: "",
+        especialidade: "",
+        corAgenda: "#6366f1",
         role: "psicologo"
     });
 
@@ -260,6 +262,30 @@ export default function MeuPerfil() {
                             <option value="admin">Administrador</option>
                         </select>
                     )}
+                    <input
+                        name="especialidade"
+                        value={novoUsuario.especialidade}
+                        onChange={handleNovoUsuarioChange}
+                        placeholder="Especialidade"
+                        className="border p-2 rounded"
+                    />
+                    <div className="flex items-center gap-3">
+                        <label className="text-sm font-medium">
+                            Cor da agenda
+                        </label>
+
+                        <input
+                            type="color"
+                            name="corAgenda"
+                            value={novoUsuario.corAgenda}
+                            onChange={handleNovoUsuarioChange}
+                            className="w-14 h-10 border rounded cursor-pointer"
+                        />
+
+                        <span className="text-sm text-gray-500">
+                            {novoUsuario.corAgenda}
+                        </span>
+                    </div>
                     <button
                         onClick={criarNovoUsuario}
                         className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"

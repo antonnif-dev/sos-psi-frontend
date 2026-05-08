@@ -1,16 +1,9 @@
 import { useEffect, useState } from "react";
-import { listarPacientes } from "../services/pacientesService";
-import { listarConsultas, criarConsulta, deletarConsulta, editarConsulta } from "../services/agendaService";
-import Card from "../components/Card";
-import { db } from "../services/firebase";
-import { doc, getDoc, getDocs, collection } from "firebase/firestore";
-import { useAuth } from "../hooks/useAuth";
+import Card from "../../components/Card";
 
-function Agenda() {
+function DemoAgenda() {
     const [consultas, setConsultas] = useState([]);
     const [pacientes, setPacientes] = useState([]);
-    const { user } = useAuth();
-    const [tenantId, setTenantId] = useState(null);
     const [disponibilidade, setDisponibilidade] = useState({});
     const [configAgenda, setConfigAgenda] = useState({
         sabado: false,
@@ -21,6 +14,64 @@ function Agenda() {
     const [modalNovo, setModalNovo] = useState(null);
     const [buscaPaciente, setBuscaPaciente] = useState("");
     const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
+
+    useEffect(() => {
+
+        setPacientes([
+            {
+                id: "1",
+                nome: "Maria Fernanda"
+            },
+            {
+                id: "2",
+                nome: "João Pedro"
+            },
+            {
+                id: "3",
+                nome: "Ana Clara"
+            }
+        ]);
+
+        setConsultas([
+            {
+                id: "1",
+                pacienteId: "1",
+                data: new Date().toISOString(),
+                status: "agendada",
+                psicologoNome: "Psicólogo Demo",
+                corAgenda: "#6366f1"
+            }
+        ]);
+
+        setDisponibilidade({
+            segunda: {
+                ativo: true,
+                inicio: "08:00",
+                fim: "18:00"
+            },
+            terca: {
+                ativo: true,
+                inicio: "08:00",
+                fim: "18:00"
+            },
+            quarta: {
+                ativo: true,
+                inicio: "08:00",
+                fim: "18:00"
+            },
+            quinta: {
+                ativo: true,
+                inicio: "08:00",
+                fim: "18:00"
+            },
+            sexta: {
+                ativo: true,
+                inicio: "08:00",
+                fim: "18:00"
+            }
+        });
+
+    }, []);
 
     const horarios = [
         "08:00", "09:00", "10:00", "11:00",
@@ -35,74 +86,6 @@ function Agenda() {
         faltou: "bg-yellow-100"
     };
     const [diaMobileIndex, setDiaMobileIndex] = useState(0);
-
-    async function carregar() {
-
-        if (!dias.length) {
-
-            console.warn("⚠️ Nenhum dia encontrado na agenda");
-
-            return;
-
-        }
-
-        const inicio = new Date(dias[0]);
-
-        const fim = new Date(
-            dias[dias.length - 1]
-        );
-
-        fim.setHours(23);
-        fim.setMinutes(59);
-        fim.setSeconds(59);
-        fim.setMilliseconds(999);
-
-        console.log("📆 =============================");
-        console.log("📆 BUSCANDO AGENDA DA SEMANA");
-        console.log("📆 =============================");
-
-        console.log("➡️ Início:", inicio);
-
-        console.log("➡️ Fim:", fim);
-
-        console.log(
-            "📅 Semana offset:",
-            semanaOffset
-        );
-
-        try {
-
-            const dados = await listarConsultas({
-                startDate: inicio.toISOString(),
-                endDate: fim.toISOString()
-            });
-
-            console.log(
-                "✅ Consultas carregadas:",
-                dados.length
-            );
-
-            setConsultas(dados);
-
-            const pacientesLista = await listarPacientes();
-
-            console.log(
-                "✅ Pacientes carregados:",
-                pacientesLista.length
-            );
-
-            setPacientes(pacientesLista);
-
-        } catch (error) {
-
-            console.error(
-                "❌ Erro ao carregar agenda:",
-                error
-            );
-
-        }
-
-    }
 
     function normalizarData(data) {
 
@@ -121,104 +104,6 @@ function Agenda() {
         // fallback
         return new Date(data);
     }
-
-    useEffect(() => {
-
-        if (!user) return;
-
-        console.log("👤 Usuário autenticado:", user.uid);
-
-        carregar();
-
-        async function carregarConfiguracoes() {
-
-            try {
-
-                console.log("⚙️ =============================");
-                console.log("⚙️ CARREGANDO CONFIGURAÇÕES");
-                console.log("⚙️ =============================");
-
-                const tenantsSnapshot = await getDocs(
-                    collection(db, "tenants")
-                );
-
-                console.log(
-                    "🏢 Tenants encontradas:",
-                    tenantsSnapshot.docs.length
-                );
-
-                for (const tenantDoc of tenantsSnapshot.docs) {
-
-                    console.log(
-                        "🔎 Verificando tenant:",
-                        tenantDoc.id
-                    );
-
-                    const userRef = doc(
-                        db,
-                        "tenants",
-                        tenantDoc.id,
-                        "usuarios",
-                        user.uid
-                    );
-
-                    const userSnap = await getDoc(userRef);
-
-                    if (userSnap.exists()) {
-
-                        console.log(
-                            "✅ Usuário pertence à tenant:",
-                            tenantDoc.id
-                        );
-
-                        setTenantId(tenantDoc.id);
-
-                        const data = tenantDoc.data();
-
-                        if (data.disponibilidade) {
-
-                            console.log(
-                                "🕐 Disponibilidade encontrada"
-                            );
-
-                            setDisponibilidade(
-                                data.disponibilidade
-                            );
-
-                        }
-
-                        if (data.agenda) {
-
-                            console.log(
-                                "📅 Configuração de agenda encontrada"
-                            );
-
-                            setConfigAgenda(
-                                data.agenda
-                            );
-
-                        }
-
-                        break;
-
-                    }
-
-                }
-
-            } catch (error) {
-
-                console.error(
-                    "❌ Erro ao carregar configurações:",
-                    error
-                );
-
-            }
-
-        }
-
-        carregarConfiguracoes();
-
-    }, [user, semanaOffset]);
 
     function inicioSemana(data) {
         const d = new Date(data);
@@ -297,24 +182,8 @@ function Agenda() {
         return p?.nome || "";
     }
 
-    function nomePsicologo(consulta) {
-
-        if (!consulta) return "Não identificado";
-
-        if (
-            consulta.psicologoNome
-        ) {
-            return consulta.psicologoNome;
-        }
-
-        if (
-            consulta.psicologoId === user?.uid
-        ) {
-            return user?.name || user?.displayName || "Você";
-        }
-
-        return consulta.psicologoId || "Não identificado";
-
+    function nomePsicologo() {
+        return "Psicólogo Demo";
     }
 
     function abrirNovo(data, horario) {
@@ -324,57 +193,36 @@ function Agenda() {
         });
     }
 
-    async function salvarConsulta() {
-        if (!pacienteSelecionado) return;
-        const [h, m] = modalNovo.horario.split(":");
-        const data = new Date(modalNovo.data);
-        data.setHours(Number(h));
-        data.setMinutes(Number(m));
-        data.setSeconds(0);
-        data.setMilliseconds(0);
-        const horarioExiste = consultaNoSlot(modalNovo.data, modalNovo.horario);
-        if (horarioExiste) {
-            alert("Já existe uma consulta nesse horário.");
-            return;
-        }
-        await criarConsulta({
-            pacienteId: pacienteSelecionado.id,
-            pacienteNome: pacienteSelecionado.nome,
-            data: data.toISOString(),
-            status: "agendada"
-        });
+    function salvarConsulta() {
+
+        alert("Consulta criada na demonstração!");
+
         setModalNovo(null);
-        setPacienteSelecionado(null);
-        setBuscaPaciente("");
-        carregar();
-    }
-
-    async function cancelarConsulta(id) {
-
-        if (!confirm("Cancelar consulta?")) return;
-
-        await deletarConsulta(id);
-
-        setModalConsulta(null);
-
-        carregar();
 
     }
 
-    async function finalizarConsulta(id) {
-        await editarConsulta(id, {
-            status: "realizada"
-        });
+    function cancelarConsulta() {
+
+        alert("Consulta cancelada na demonstração!");
+
         setModalConsulta(null);
-        carregar();
+
     }
 
-    async function marcarFalta(id) {
-        await editarConsulta(id, {
-            status: "faltou"
-        });
+    function finalizarConsulta() {
+
+        alert("Sessão finalizada na demonstração!");
+
         setModalConsulta(null);
-        carregar();
+
+    }
+
+    function marcarFalta() {
+
+        alert("Falta registrada na demonstração!");
+
+        setModalConsulta(null);
+
     }
 
     const sugestoes = pacientes.filter(p =>
@@ -773,4 +621,4 @@ function Agenda() {
     )
 }
 
-export default Agenda
+export default DemoAgenda

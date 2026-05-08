@@ -20,6 +20,9 @@ import MeuPerfil from "./pages/MeuPerfil";
 import MuralGlobal from "./pages/MuralGlobal";
 import RoleRoute from "./routes/RoleRoute";
 
+//demo
+import AppDemo from "./demo/AppDemo";
+
 //estetica
 import AvaliacaoFisica from "./pages/estetica/AvaliacaoFisica";
 import Treinos from "./pages/estetica/Treinos";
@@ -68,6 +71,13 @@ function App() {
 
                 {/* ---------------------------- Páginas Gerais ---------------------------- */}
                 <Route path="/" element={<Login />} />
+
+                {/* --------------------------------- Demo --------------------------------- */}
+                <Route
+                    path="/demo/*"
+                    element={<AppDemo />}
+                />
+
                 <Route
                     path="/dashboard"
                     element={

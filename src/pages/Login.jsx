@@ -216,6 +216,21 @@ function Login() {
               <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition-all shadow-lg">
                 Entrar
               </button>
+              <button
+                type="button"
+                onClick={() => navigate("/demo/dashboard")}
+                className="
+  border border-indigo-600
+  text-indigo-600
+  hover:bg-indigo-50
+  font-semibold
+  py-3
+  rounded-xl
+  transition-all
+ "
+              >
+                Testar Demonstração
+              </button>
             </form>
           </motion.div>
 
