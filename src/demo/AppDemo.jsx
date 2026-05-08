@@ -9,7 +9,7 @@ import DemoAgenda from "./pages/DemoAgenda";
 import DemoFinanceiro from "./pages/DemoFinanceiro";
 import DemoMapaEvolucao from "./pages/DemoMapaEvolucao";
 import DemoMural from "./pages/DemoMural";
-import DemoPacientes from "./pages/DemoPacientes";
+import DemoPacientes from "./pages/DemoPacientes.jsx";
 import DemoProntuario from "./pages/DemoProntuario";
 
 import DemoDashboardLayout
