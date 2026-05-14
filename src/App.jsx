@@ -9,7 +9,6 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import Agenda from "./pages/Agenda";
 import Financeiro from "./pages/Financeiro";
 import Documentos from "./pages/Documentos";
-import Prontuario from "./pages/Prontuario";
 import MapaEvolucao from "./pages/MapaEvolucao";
 import Prescrição from "./pages/Prescricao";
 import Configuracoes from "./pages/Configuracoes";
@@ -25,6 +24,7 @@ import AppDemo from "./demo/AppDemo";
 
 //saude
 import Anamnese from "./pages/saude/Anamnese";
+import Prontuario from "./pages/saude/Prontuario";
 
 //estetica
 import AvaliacaoFisica from "./pages/estetica/AvaliacaoFisica";

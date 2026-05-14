@@ -125,15 +125,34 @@ function Anamnese() {
     return (
         <div className="space-y-8">
             <div>
-                <h1 className="text-2xl font-semibold text-gray-800">
-                    Anamnese
-                </h1>
+                <div className="space-y-2">
+                    <h1 className="text-3xl font-bold text-slate-800">
+                        Anamnese Clínica
+                    </h1>
+
+                    <p className="text-slate-500">
+                        Registre observações, evolução clínica e informações relevantes do paciente.
+                    </p>
+                </div>
 
                 <div className="mt-4">
                     <select
                         value={pacienteSelecionadoId}
                         onChange={selecionarPaciente}
-                        className="border p-2 rounded w-full"
+                        className="
+    w-full
+    rounded-2xl
+    border
+    border-slate-200
+    bg-white
+    px-4
+    py-3
+    text-slate-700
+    shadow-sm
+    focus:outline-none
+    focus:ring-2
+    focus:ring-indigo-500
+"
                     >
                         <option value="">
                             Selecionar paciente
@@ -148,15 +167,31 @@ function Anamnese() {
                 </div>
 
                 {pacienteSelecionadoId && (
-                    <Card>
+                    <Card className="rounded-3xl border border-slate-200 shadow-md">
                         <h2 className="font-semibold mb-3">{labels.observacoes} Clínicas</h2>
 
                         {observacoes.length > 0 ? (
                             <div className="space-y-3">
                                 {observacoes.map(obs => (
-                                    <div key={obs.id} className="border p-3 rounded bg-gray-50">
-                                        <p className="text-xs text-gray-500">{obs.data}</p>
-                                        <p className="text-sm">{obs.texto}</p>
+                                    <div
+                                        key={obs.id}
+                                        className="
+        relative
+        border-l-4
+        border-indigo-500
+        bg-slate-50
+        rounded-2xl
+        px-4
+        py-4
+        shadow-sm
+    "
+                                    >
+                                        <p className="text-xs uppercase tracking-wide text-slate-400 mb-2">
+                                            {obs.data}
+                                        </p>
+                                        <p className="text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap">
+                                            {obs.texto}
+                                        </p>
                                     </div>
                                 ))}
                             </div>
@@ -164,11 +199,24 @@ function Anamnese() {
                             <p className="text-sm text-gray-500">Nenhuma {labels.observacao} registrada.</p>
                         )}
 
-                        <div className="mt-4">
+                        <div className="pt-6 mt-6">
                             <textarea
                                 value={novaObs}
                                 onChange={(e) => setNovaObs(e.target.value)}
-                                className="w-full border rounded p-2 text-sm"
+                                className="
+    w-full
+    min-h-[140px]
+    rounded-2xl
+    border
+    border-slate-200
+    bg-slate-50
+    p-4
+    text-sm
+    shadow-inner
+    focus:outline-none
+    focus:ring-2
+    focus:ring-indigo-500
+"
                                 placeholder="Adicionar nova observação..."
                             />
 
