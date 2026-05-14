@@ -24,10 +24,11 @@ export default function MuralGlobalPage() {
                 }`}
         >
             <div className="max-w-7xl mx-auto">
+                {/* 
                 <h1 className="text-2xl font-bold mb-6">
                     {config?.labels?.mural || "Mural"}
                 </h1>
-
+*/}
                 <MuralGlobal
                     tenantNome={tenant.nome}
                     expandidoPadrao={true}

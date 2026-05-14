@@ -48,6 +48,11 @@ function Agenda() {
 
         const inicio = new Date(dias[0]);
 
+        inicio.setHours(0);
+        inicio.setMinutes(0);
+        inicio.setSeconds(0);
+        inicio.setMilliseconds(0);
+
         const fim = new Date(
             dias[dias.length - 1]
         );
@@ -58,17 +63,11 @@ function Agenda() {
         fim.setMilliseconds(999);
 
         console.log("📆 =============================");
-        console.log("📆 BUSCANDO AGENDA DA SEMANA");
+        console.log("📆 BUSCANDO CONSULTAS");
         console.log("📆 =============================");
 
         console.log("➡️ Início:", inicio);
-
         console.log("➡️ Fim:", fim);
-
-        console.log(
-            "📅 Semana offset:",
-            semanaOffset
-        );
 
         try {
 
@@ -82,9 +81,42 @@ function Agenda() {
                 dados.length
             );
 
+            console.log("📦 CONSULTAS RECEBIDAS:");
+            console.log(dados);
+
+            dados.forEach(c => {
+
+                const dataNormalizada =
+                    normalizarData(c.data);
+
+                console.log("🧩 Consulta recebida:", {
+                    id: c.id,
+                    dataOriginal: c.data,
+                    dataConvertida: dataNormalizada,
+                    horario:
+                        dataNormalizada
+                            ?.getHours()
+                            ?.toString()
+                            ?.padStart(2, "0")
+                        +
+                        ":" +
+                        dataNormalizada
+                            ?.getMinutes()
+                            ?.toString()
+                            ?.padStart(2, "0"),
+                    paciente: c.pacienteNome,
+                    psicologo: c.psicologoNome,
+                    status: c.status
+                });
+
+            });
+
             setConsultas(dados);
 
-            const pacientesLista = await listarPacientes();
+            console.log("🧠 Estado consultas atualizado");
+
+            const pacientesLista =
+                await listarPacientes();
 
             console.log(
                 "✅ Pacientes carregados:",
@@ -123,37 +155,16 @@ function Agenda() {
     }
 
     useEffect(() => {
-
         if (!user) return;
-
-        console.log("👤 Usuário autenticado:", user.uid);
-
         carregar();
 
         async function carregarConfiguracoes() {
-
             try {
-
-                console.log("⚙️ =============================");
-                console.log("⚙️ CARREGANDO CONFIGURAÇÕES");
-                console.log("⚙️ =============================");
-
                 const tenantsSnapshot = await getDocs(
                     collection(db, "tenants")
                 );
 
-                console.log(
-                    "🏢 Tenants encontradas:",
-                    tenantsSnapshot.docs.length
-                );
-
                 for (const tenantDoc of tenantsSnapshot.docs) {
-
-                    console.log(
-                        "🔎 Verificando tenant:",
-                        tenantDoc.id
-                    );
-
                     const userRef = doc(
                         db,
                         "tenants",
@@ -165,59 +176,33 @@ function Agenda() {
                     const userSnap = await getDoc(userRef);
 
                     if (userSnap.exists()) {
-
-                        console.log(
-                            "✅ Usuário pertence à tenant:",
-                            tenantDoc.id
-                        );
-
                         setTenantId(tenantDoc.id);
-
                         const data = tenantDoc.data();
 
                         if (data.disponibilidade) {
-
-                            console.log(
-                                "🕐 Disponibilidade encontrada"
-                            );
-
                             setDisponibilidade(
                                 data.disponibilidade
                             );
-
                         }
 
                         if (data.agenda) {
-
-                            console.log(
-                                "📅 Configuração de agenda encontrada"
-                            );
-
                             setConfigAgenda(
                                 data.agenda
                             );
-
                         }
 
                         break;
-
                     }
-
                 }
 
             } catch (error) {
-
                 console.error(
                     "❌ Erro ao carregar configurações:",
                     error
                 );
-
             }
-
         }
-
         carregarConfiguracoes();
-
     }, [user, semanaOffset]);
 
     function inicioSemana(data) {
@@ -275,12 +260,16 @@ function Agenda() {
         return horario >= inicio && horario <= fim;
     }
 
-    function consultaNoSlot(data, horario) {
-        return consultas.find(c => {
+    function consultasNoSlot(data, horario) {
+        return consultas.filter(c => {
+
             const d = normalizarData(c.data);
+
             if (!d) return false;
+
             const h =
-                d.getHours().toString().padStart(2, "0") +
+                d.getHours().toString().padStart(2, "0")
+                +
                 ":" +
                 d.getMinutes().toString().padStart(2, "0");
 
@@ -289,7 +278,9 @@ function Agenda() {
                 &&
                 h === horario
             );
+
         });
+
     }
 
     function nomePaciente(id) {
@@ -383,17 +374,14 @@ function Agenda() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+            <div className="flex flex-col md:flex-row md:justify-center md:items-center gap-2 md:gap-10">
                 <div>
-                    <h1 className="text-xl md:text-2xl font-semibold">
-                        Agenda
-                    </h1>
-                    <p className="text-sm text-gray-500">
+                    <p className="flex justify-center text-sm text-gray-500">
                         {periodoSemana()}
                     </p>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex justify-center gap-2">
                     <button
                         onClick={() => setSemanaOffset(semanaOffset - 1)}
                         className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
@@ -415,91 +403,22 @@ function Agenda() {
                 </div>
             </div>
 
-            <div className="md:hidden">
-
-                <div className="flex justify-between items-center mb-3">
-
-                    <button
-                        onClick={() => setDiaMobileIndex(Math.max(diaMobileIndex - 1, 0))}
-                        className="px-2 py-1 bg-gray-200 rounded"
-                    >
-                        ◀
-                    </button>
-
-                    <div className="text-center">
-                        <div className="font-medium">
-                            {dias[diaMobileIndex]?.toLocaleDateString("pt-BR", { weekday: "long" })}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                            {dias[diaMobileIndex]?.toLocaleDateString()}
-                        </div>
-                    </div>
-
-                    <button
-                        onClick={() =>
-                            setDiaMobileIndex(
-                                Math.min(diaMobileIndex + 1, dias.length - 1)
-                            )
-                        }
-                        className="px-2 py-1 bg-gray-200 rounded"
-                    >
-                        ▶
-                    </button>
-
-                </div>
-
-                <div className="space-y-2">
-                    {horarios.map(h => {
-                        const dia = dias[diaMobileIndex];
-                        const consulta = consultaNoSlot(dia, h);
-                        const disponivel = horarioDisponivel(dia, h);
-
-                        return (
-                            <div
-                                key={h}
-                                className={`flex justify-between items-center p-3 border rounded
-                    ${!disponivel ? "bg-gray-100" : "hover:bg-indigo-50"}`}
-                                onClick={() => {
-                                    if (!disponivel) return;
-                                    if (consulta) {
-                                        setModalConsulta(consulta);
-                                    } else {
-                                        abrirNovo(dia, h);
-                                    }
-                                }}
-                            >
-                                <span className="text-sm text-gray-600">
-                                    {h}
-                                </span>
-                                <span className="text-sm">
-                                    {consulta
-                                        ? nomePaciente(consulta.pacienteId)
-                                        : disponivel
-                                            ? "Disponível"
-                                            : "Indisponível"}
-
-                                </span>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-
-            <Card>
-                <div className="overflow-x-auto hidden md:block">
-                    <div className="grid min-w-[600px] border"
+            <Card className="overflow-hidden">
+                <div className="overflow-x-auto">
+                    <div className="grid w-full border text-[10px] md:text-xs"
                         style={{
-                            gridTemplateColumns: `80px repeat(${dias.length},1fr)`
+                            gridTemplateColumns: `${window.innerWidth < 768 ? "48px" : "80px"}
+                                                    repeat(${dias.length}, minmax(0,1fr))`
                         }}
                     >
                         <div></div>
 
                         {dias.map((d, i) => (
                             <div key={i} className="border p-2 text-center">
-                                <div className="font-medium text-sm md:text-base">
+                                <div className="font-medium text-[10px] md:text-base">
                                     {d.toLocaleDateString("pt-BR", { weekday: "short" })}
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-[7px] md:text-xs text-gray-500">
                                     {d.toLocaleDateString()}
                                 </div>
                             </div>
@@ -510,45 +429,69 @@ function Agenda() {
                                     {h}
                                 </div>
                                 {dias.map((dia, i) => {
-                                    const consulta = consultaNoSlot(dia, h);
+                                    const consultasSlot = consultasNoSlot(dia, h) || [];
                                     const disponivel = horarioDisponivel(dia, h);
                                     return (
                                         <div
                                             key={dia.toISOString() + h}
-                                            className={`border h-16 p-1 text-xs ${!disponivel ?
-                                                "bg-gray-100 cursor-not-allowed" : "hover:bg-indigo-50 cursor-pointer"} `}
+                                            className={`
+    border
+    h-12 
+    p-[1px] md:p-1
+    p-1
+    text-xs
+    flex
+    flex-col
+    gap-[2px]
+    overflow-hidden
+    ${!disponivel
+                                                    ? "bg-gray-200 cursor-not-allowed"
+                                                    : "hover:bg-indigo-50 cursor-pointer"
+                                                }
+`}
                                             onClick={() => {
                                                 if (!disponivel) return;
-                                                if (consulta) {
-                                                    setModalConsulta(consulta);
-                                                } else {
+                                                if (consultasSlot.length === 1) {
+
+                                                    setModalConsulta(
+                                                        consultasSlot[0]
+                                                    );
+
+                                                } else if (consultasSlot.length === 0) {
+
                                                     abrirNovo(dia, h);
+
                                                 }
                                             }}
                                         >
-                                            {consulta && (
+                                            {consultasSlot.map(consulta => (
                                                 <div
                                                     className={`
-        ${coresStatus[consulta.status] || "bg-indigo-100"}
-        rounded
-        p-2
-        border-l-4
-    `}
+    ${coresStatus[consulta.status] || "bg-indigo-100"}
+    rounded
+    px-1
+    py-[2px]
+    border-l-4
+    flex-1
+    overflow-hidden
+    min-h-0
+    min-w-0
+`}
                                                     style={{
                                                         borderLeftColor: consulta.corAgenda || "#6366f1"
                                                     }}
                                                 >
-                                                    <div className="font-medium truncate">
+                                                    <div className="font-medium truncate leading-none text-[8px] md:text-[10px]">
                                                         {nomePaciente(consulta.pacienteId)}
                                                     </div>
 
                                                     {consulta.psicologoNome && (
-                                                        <div className="text-[10px] text-gray-600 truncate">
+                                                        <div className="text-[7px] md:text-[8px] text-gray-600 truncate leading-none">
                                                             {consulta.psicologoNome}
                                                         </div>
                                                     )}
                                                 </div>
-                                            )}
+                                            ))}
                                         </div>
                                     )
                                 })}

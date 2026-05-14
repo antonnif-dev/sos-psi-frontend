@@ -44,6 +44,12 @@ export const segmentConfig = {
                 roles: ["admin", "medico"],
                 profissoes: ["medico"]
             },
+            {
+                label: "Anamnese",
+                path: "/anamnese",
+                roles: ["admin", "psicologo"],
+                profissoes: ["psicologo"]
+            },
             /*
             {
                 label: "Prescrições",

@@ -23,6 +23,9 @@ import RoleRoute from "./routes/RoleRoute";
 //demo
 import AppDemo from "./demo/AppDemo";
 
+//saude
+import Anamnese from "./pages/saude/Anamnese";
+
 //estetica
 import AvaliacaoFisica from "./pages/estetica/AvaliacaoFisica";
 import Treinos from "./pages/estetica/Treinos";
@@ -172,6 +175,20 @@ function App() {
                                 <ProfissaoRoute allowedProfissoes={["psicologo", "nutricionista"]}>
                                     <DashboardLayout>
                                         <Prontuario />
+                                    </DashboardLayout>
+                                </ProfissaoRoute>
+                            </SegmentRoute>
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/anamnese"
+                    element={
+                        <PrivateRoute>
+                            <SegmentRoute allowedSegments={["saude"]}>
+                                <ProfissaoRoute allowedProfissoes={["psicologo", "nutricionista"]}>
+                                    <DashboardLayout>
+                                        <Anamnese />
                                     </DashboardLayout>
                                 </ProfissaoRoute>
                             </SegmentRoute>

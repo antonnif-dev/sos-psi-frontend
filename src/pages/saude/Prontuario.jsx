@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { listarProntuarios, criarProntuario, editarProntuario, deletarProntuario } from "../services/prontuarioService";
-import { listarSessoesRealizadas } from "../services/agendaService";
-import Card from "../components/Card";
+import { listarProntuarios, criarProntuario, editarProntuario, deletarProntuario } from "../../services/prontuarioService";
+import { listarSessoesRealizadas } from "../../services/agendaService";
+import Card from "../../components/Card";
 
 function CampoNumero({ label, value, setter, disabled }) {
     return (

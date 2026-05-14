@@ -19,3 +19,15 @@ export async function deletarPaciente(id) {
     const res = await api.delete(`/pacientes/${id}`);
     return res.data;
 }
+
+export async function alterarPsicologoPaciente(
+    pacienteId,
+    psicologoId
+) {
+    const response = await api.put(
+        `/pacientes/${pacienteId}/psicologo`,
+        { psicologoId }
+    );
+
+    return response.data;
+}

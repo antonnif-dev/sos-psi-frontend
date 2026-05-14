@@ -153,95 +153,96 @@ export default function Configuracoes() {
 
     return (
 
-        <div className="space-y-8">
+        <div className="space-y-5">
+            <div className="space-y-8 flex flex-col md:flex-row justify-center items-center md:gap-5 lg:gap-10">
 
-            <h1 className="text-2xl font-bold">
-                Configurações da Clínica
-            </h1>
+                <div className="bg-white p-6 rounded shadow flex flex-col gap-4 max-w-md">
 
-            <div className="bg-white p-6 rounded shadow flex flex-col gap-4 max-w-md">
+                    <h2 className="font-semibold text-lg">
+                        Informações da Clínica
+                    </h2>
 
-                <h2 className="font-semibold text-lg">
-                    Informações da Clínica
-                </h2>
+                    <input
+                        name="nome"
+                        value={form.nome}
+                        onChange={handleChange}
+                        placeholder="Nome da clínica"
+                        className="border p-2 rounded"
+                    />
 
-                <input
-                    name="nome"
-                    value={form.nome}
-                    onChange={handleChange}
-                    placeholder="Nome da clínica"
-                    className="border p-2 rounded"
-                />
+                    <input
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        placeholder="Email"
+                        className="border p-2 rounded"
+                    />
 
-                <input
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="Email"
-                    className="border p-2 rounded"
-                />
+                </div>
+
+                <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
+
+                    <h2 className="font-semibold text-lg">
+                        Disponibilidade semanal
+                    </h2>
+
+                    {dias.map(dia => {
+
+                        const dados = disponibilidade[dia];
+
+                        return (
+
+                            <div
+                                key={dia}
+                                className="flex items-center gap-3 flex-wrap"
+                            >
+
+                                <input
+                                    type="checkbox"
+                                    checked={dados.ativo}
+                                    onChange={(e) => handleDisponibilidade(dia, "ativo", e.target.checked)}
+                                />
+
+                                <span className="w-24 capitalize">
+                                    {dia}
+                                </span>
+
+                                <input
+                                    type="time"
+                                    value={dados.inicio}
+                                    disabled={!dados.ativo}
+                                    onChange={(e) => handleDisponibilidade(dia, "inicio", e.target.value)}
+                                    className="border p-1 rounded"
+                                />
+
+                                <span>até</span>
+
+                                <input
+                                    type="time"
+                                    value={dados.fim}
+                                    disabled={!dados.ativo}
+                                    onChange={(e) => handleDisponibilidade(dia, "fim", e.target.value)}
+                                    className="border p-1 rounded"
+                                />
+
+                            </div>
+
+                        )
+
+                    })}
+
+                </div>
 
             </div>
 
-            <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
-
-                <h2 className="font-semibold text-lg">
-                    Disponibilidade semanal
-                </h2>
-
-                {dias.map(dia => {
-
-                    const dados = disponibilidade[dia];
-
-                    return (
-
-                        <div
-                            key={dia}
-                            className="flex items-center gap-3 flex-wrap"
-                        >
-
-                            <input
-                                type="checkbox"
-                                checked={dados.ativo}
-                                onChange={(e) => handleDisponibilidade(dia, "ativo", e.target.checked)}
-                            />
-
-                            <span className="w-24 capitalize">
-                                {dia}
-                            </span>
-
-                            <input
-                                type="time"
-                                value={dados.inicio}
-                                disabled={!dados.ativo}
-                                onChange={(e) => handleDisponibilidade(dia, "inicio", e.target.value)}
-                                className="border p-1 rounded"
-                            />
-
-                            <span>até</span>
-
-                            <input
-                                type="time"
-                                value={dados.fim}
-                                disabled={!dados.ativo}
-                                onChange={(e) => handleDisponibilidade(dia, "fim", e.target.value)}
-                                className="border p-1 rounded"
-                            />
-
-                        </div>
-
-                    )
-
-                })}
-
+            <div className="flex justify-center">
+                <button
+                    onClick={salvar}
+                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                >
+                    Salvar Configurações
+                </button>
             </div>
-
-            <button
-                onClick={salvar}
-                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-            >
-                Salvar Configurações
-            </button>
 
         </div>
 

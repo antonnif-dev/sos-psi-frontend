@@ -63,7 +63,18 @@ function LayoutPsicologia({ children }) {
                 </div>
 
                 {/* AÇÕES */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
+                    {roleUsuario === "admin" && (
+                        <Link
+                            to="/configuracoes"
+                            className="flex flex-col items-center gap-1 text-slate-600 hover:text-cyan-700 transition"
+                        >
+                            <Settings size={20} />
+                            <span className="text-xs font-medium">
+                                Config
+                            </span>
+                        </Link>
+                    )}
                     <NotificationBell />
                     <div className="w-px h-6 bg-slate-300"></div>
                     <LogoutButton />
@@ -81,15 +92,11 @@ function LayoutPsicologia({ children }) {
 
             </main>
 
-            {/* MURAL na tela inicial como jogos mobile
-            <MuralGlobal tenantNome={tenant.nome} />
-            */}
-
             {/* MENU INFERIOR */}
-            <nav className="fixed bottom-0 left-0 right-0 z-50 px-2 pb-2">
-                <div className="max-w-6xl mx-auto bg-white/95 backdrop-blur-xl border border-cyan-100 rounded-3xl shadow-2xl px-4 py-4">
+            <nav className="fixed bottom-0 left-0 right-0 z-50 px-1 md:px-15 py-1">
+                <div className="bg-cyan-500 backdrop-blur-xl border border-cyan-100 rounded-3xl shadow-2xl px-4 py-4">
 
-                    <div className="flex justify-center items-center flex-wrap gap-3 lg:gap-4">
+                    <div className="flex justify-center md:justify-around items-center flex-wrap md:flex-nowrap rounded-2xl gap-1 lg:gap-4">
 
                         {menu.map((item) => {
                             if (item.roles && !item.roles.includes(roleUsuario)) {
@@ -100,9 +107,9 @@ function LayoutPsicologia({ children }) {
                                 <Link
                                     key={item.path}
                                     to={item.path}
-                                    className="flex flex-col items-center justify-center min-w-[75px] gap-1 text-slate-600 hover:text-cyan-700 transition"
+                                    className="flex flex-col items-center justify-center min-w-[75px] gap-1 md:gap-5 text-slate-600 hover:text-cyan-700 transition"
                                 >
-                                    <span className="text-xs md:text-sm font-medium text-center">
+                                    <span className="text-xs md:text-2xl font-medium text-center">
                                         {item.label}
                                     </span>
                                 </Link>
@@ -119,19 +126,6 @@ function LayoutPsicologia({ children }) {
                                 Perfil
                             </span>
                         </Link>
-
-                        {/* CONFIG */}
-                        {roleUsuario === "admin" && (
-                            <Link
-                                to="/configuracoes"
-                                className="flex flex-col items-center gap-1 text-slate-600 hover:text-cyan-700 transition"
-                            >
-                                <Settings size={20} />
-                                <span className="text-xs font-medium">
-                                    Config
-                                </span>
-                            </Link>
-                        )}
 
                     </div>
 

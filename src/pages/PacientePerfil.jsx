@@ -6,6 +6,8 @@ import Card from "../components/Card";
 import { auth } from "../services/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useSegment } from "../hooks/useSegment";
+import { listarUsuarios } from "../services/usersService";
+import { alterarPsicologoPaciente } from "../services/pacientesService";
 
 function PacientePerfil() {
     const { id } = useParams();
@@ -13,6 +15,10 @@ function PacientePerfil() {
     const [paciente, setPaciente] = useState(null);
     const [observacoes, setObservacoes] = useState([]);
     const [novaObs, setNovaObs] = useState("");
+    const [role, setRole] = useState(null);
+
+    const [psicologos, setPsicologos] = useState([]);
+    const [psicologoResponsavel, setPsicologoResponsavel] = useState(null);
 
     const segment = useSegment();
     const labels = segment.labels;
@@ -21,39 +27,89 @@ function PacientePerfil() {
 
     // observar autenticação
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (u) => {
-            if (u) {
+
+        const unsubscribe = onAuthStateChanged(auth, async (u) => {
+
+            if (!u) {
+
+                setUser(null);
+                return;
+            }
+
+            try {
+
+                const usuarios = await listarUsuarios();
+
+                const usuarioAtual = usuarios.find(
+                    usuario => usuario.uid === u.uid
+                );
+
                 setUser({
                     uid: u.uid,
                     email: u.email,
+                    role: usuarioAtual?.role || ""
                 });
-            } else {
-                setUser(null);
+
+            } catch (err) {
+
+                console.error("ERRO AO CARREGAR USER:", err);
             }
         });
+
         return () => unsubscribe();
+
     }, []);
 
     // carregar paciente quando user estiver definido
     useEffect(() => {
+
         if (!user || !tenantId) return;
 
         async function carregarPaciente() {
+
             try {
+
+                // PACIENTE
                 const data = await listarPacientes(tenantId);
-                const p = data.find(p => p.id === id);
 
-                setPaciente(p || {});
+                const pacienteEncontrado = data.find(
+                    p => p.id === id
+                );
 
-                const obs = await listarObservacoes(tenantId, id);
+                setPaciente(pacienteEncontrado || {});
+
+                // USUÁRIOS
+                const usuarios = await listarUsuarios();
+
+                const psicologosTenant = usuarios.filter(
+                    u => u.role === "psicologo"
+                );
+
+                setPsicologos(psicologosTenant);
+
+                // PSICÓLOGO RESPONSÁVEL
+                const psicologoAtual = psicologosTenant.find(
+                    psic => psic.uid === pacienteEncontrado?.psicologoId
+                );
+
+                setPsicologoResponsavel(psicologoAtual || null);
+
+                // OBSERVAÇÕES
+                const obs = await listarObservacoes(
+                    tenantId,
+                    id
+                );
+
                 setObservacoes(obs);
 
             } catch (err) {
+
                 console.error("ERRO:", err);
             }
         }
 
         carregarPaciente();
+
     }, [user, id, tenantId]);
 
     if (!user) return <p>Carregando usuário...</p>;
@@ -72,6 +128,33 @@ function PacientePerfil() {
         setNovaObs("");
     }
 
+    async function trocarPsicologo(novoPsicologoId) {
+        try {
+
+            await alterarPsicologoPaciente(
+                paciente.id,
+                novoPsicologoId
+            );
+
+            const psicologoNovo = psicologos.find(
+                p => p.uid === novoPsicologoId
+            );
+
+            setPsicologoResponsavel(psicologoNovo);
+
+            setPaciente(prev => ({
+                ...prev,
+                psicologoId: novoPsicologoId
+            }));
+
+            alert("Psicólogo responsável alterado com sucesso!");
+
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao alterar psicólogo responsável.");
+        }
+    }
+
     return (
         <div className="space-y-6">
             <h1 className="text-2xl font-semibold">{paciente.nome || "Sem nome"}</h1>
@@ -87,7 +170,40 @@ function PacientePerfil() {
                     <div>
                         <p><b>Profissão:</b> {paciente.profissao || "-"}</p>
                         <p><b>Status:</b> {paciente.status || "-"}</p>
+                        <p>
+                            <b>Psicólogo Responsável:</b>{" "}
 
+                            {user?.role === "admin" ? (
+
+                                <select
+                                    value={paciente.psicologoId || ""}
+                                    onChange={(e) => trocarPsicologo(e.target.value)}
+                                    className="border rounded px-2 py-1"
+                                >
+
+                                    <option value="">
+                                        Selecione
+                                    </option>
+
+                                    {psicologos.map((psic) => (
+
+                                        <option
+                                            key={psic.uid}
+                                            value={psic.uid}
+                                        >
+                                            {psic.nome}
+                                        </option>
+
+                                    ))}
+
+                                </select>
+
+                            ) : (
+
+                                psicologoResponsavel?.nome || "-"
+
+                            )}
+                        </p>
                     </div>
                 </div>
             </Card>

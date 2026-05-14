@@ -40,7 +40,20 @@ export default function NotificationDropdown({
   }[position] || "absolute right-0 top-12";
 
   return (
-    <div className={`${positionClass} w-80 bg-white shadow-lg rounded-lg z-[9999] text-black`}>
+    <div
+      className={`
+    ${positionClass}
+    w-80
+    max-h-[70vh]
+    overflow-y-auto
+    bg-white
+    shadow-2xl
+    rounded-lg
+    z-[9999]
+    text-black
+    border
+  `}
+    >
       {notificacoes.length === 0 && (
         <div className="p-4 text-sm text-gray-500">
           Nenhuma notificação

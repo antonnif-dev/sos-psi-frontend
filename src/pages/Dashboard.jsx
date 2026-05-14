@@ -29,13 +29,9 @@ function Dashboard() {
             <div>
                 {tenant?.segmento === "saude" && (
                     <section className="mb-8">
-                        <div className="relative overflow-hidden rounded-[2.5rem] bg-white border border-cyan-100 shadow-xl p-8 md:p-12">
+                        <div className="rounded-[2.5rem] bg-white border border-cyan-100 shadow-xl p-8 md:p-12">
 
-                            {/* DECORAÇÃO */}
-                            <div className="absolute top-0 right-0 w-56 h-56 bg-cyan-100 rounded-full blur-3xl opacity-40"></div>
-                            <div className="absolute bottom-0 left-0 w-44 h-44 bg-emerald-100 rounded-full blur-3xl opacity-40"></div>
-
-                            <div className="relative z-10">
+                            <div>
                                 <p className="uppercase tracking-[0.25em] text-sm text-cyan-600 font-semibold mb-3">
                                     Humanização, equilíbrio e saúde integral
                                 </p>
@@ -58,13 +54,9 @@ function Dashboard() {
 
                 {tenant?.segmento === "profissionais" && (
                     <section className="px-6 md:px-10 pt-2">
-                        <div className="relative overflow-hidden rounded-[2.5rem] bg-white border border-slate-200 shadow-2xl">
-
-                            {/* DECORAÇÃO */}
-                            <div className="absolute top-0 right-0 w-72 h-72 bg-amber-100 rounded-full blur-3xl opacity-40"></div>
-                            <div className="absolute bottom-0 left-0 w-60 h-60 bg-slate-200 rounded-full blur-3xl opacity-30"></div>
-
-                            <div className="relative z-10 p-8 md:p-12">
+                        <div className="overflow-hidden rounded-[2.5rem] bg-white border border-slate-200 shadow-2xl">
+                            
+                            <div className="z-10 p-8 md:p-12">
                                 <p className="uppercase tracking-[0.25em] text-sm text-amber-600 font-semibold mb-3">
                                     Estratégia, autoridade e gestão profissional
                                 </p>
@@ -87,13 +79,9 @@ function Dashboard() {
 
                 {tenant?.segmento === "estetica" && (
                     <section className="mb-10">
-                        <div className="relative overflow-hidden rounded-[2.5rem] bg-white border border-emerald-100 shadow-xl">
+                        <div className="overflow-hidden rounded-[2.5rem] bg-white border border-emerald-100 shadow-xl">
 
-                            {/* DECORAÇÃO */}
-                            <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-100 rounded-full blur-3xl opacity-40"></div>
-                            <div className="absolute bottom-0 left-0 w-60 h-60 bg-teal-100 rounded-full blur-3xl opacity-30"></div>
-
-                            <div className="relative z-10 p-8 md:p-12">
+                            <div className="z-10 p-8 md:p-12">
                                 <p className="uppercase tracking-[0.25em] text-sm text-emerald-600 font-semibold mb-3">
                                     Movimento, saúde e evolução
                                 </p>
@@ -114,13 +102,9 @@ function Dashboard() {
 
                 {tenant?.segmento === "educacao" && (
                     <section className="mb-10">
-                        <div className="relative overflow-hidden rounded-[2.5rem] bg-white border border-blue-100 shadow-xl">
+                        <div className="overflow-hidden rounded-[2.5rem] bg-white border border-blue-100 shadow-xl">
 
-                            {/* DECORAÇÃO */}
-                            <div className="absolute top-0 right-0 w-80 h-80 bg-blue-100 rounded-full blur-3xl opacity-40"></div>
-                            <div className="absolute bottom-0 left-0 w-72 h-72 bg-violet-100 rounded-full blur-3xl opacity-30"></div>
-
-                            <div className="relative z-10 p-8 md:p-14">
+                            <div className="z-10 p-8 md:p-14">
 
                                 <p className="uppercase tracking-[0.35em] text-sm text-indigo-500 font-semibold mb-4">
                                     Educação • Ensino • Desenvolvimento
@@ -144,13 +128,9 @@ function Dashboard() {
 
                 {tenant?.segmento === "beleza" && (
                     <section className="mb-10">
-                        <div className="relative overflow-hidden rounded-[2.5rem] bg-white border border-pink-100 shadow-xl">
+                        <div className="overflow-hidden rounded-[2.5rem] bg-white border border-pink-100 shadow-xl">
 
-                            {/* DECORAÇÃO */}
-                            <div className="absolute top-0 right-0 w-80 h-80 bg-pink-100 rounded-full blur-3xl opacity-40"></div>
-                            <div className="absolute bottom-0 left-0 w-72 h-72 bg-fuchsia-100 rounded-full blur-3xl opacity-30"></div>
-
-                            <div className="relative z-10 p-8 md:p-14">
+                            <div className="z-10 p-8 md:p-14">
 
                                 <p className="uppercase tracking-[0.35em] text-sm text-rose-500 font-semibold mb-4">
                                     Sofisticação para profissionais da beleza
@@ -174,14 +154,9 @@ function Dashboard() {
 
                 {tenant?.segmento === "criativo" && (
                     <section className="mb-10">
-                        <div className="relative overflow-hidden rounded-[2.5rem] bg-white/5 border border-cyan-400/10 shadow-2xl backdrop-blur-md">
+                        <div className="overflow-hidden rounded-[2.5rem] bg-white/5 border border-cyan-400/10 shadow-2xl backdrop-blur-md">
 
-                            {/* EFEITOS */}
-                            <div className="absolute top-0 right-0 w-80 h-80 bg-fuchsia-500/20 rounded-full blur-3xl"></div>
-                            <div className="absolute bottom-0 left-0 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl"></div>
-                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent"></div>
-
-                            <div className="relative z-10 p-8 md:p-14">
+                            <div className="z-10 p-8 md:p-14">
 
                                 <p className="uppercase tracking-[0.35em] text-sm text-cyan-300 font-semibold mb-4">
                                     Produção • Imagem • Criatividade
