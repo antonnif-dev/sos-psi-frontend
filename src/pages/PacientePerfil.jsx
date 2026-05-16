@@ -8,6 +8,14 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useSegment } from "../hooks/useSegment";
 import { listarUsuarios } from "../services/usersService";
 import { alterarPsicologoPaciente } from "../services/pacientesService";
+import { useAuth } from "../hooks/useAuth";
+import { db } from "../services/firebase";
+import {
+    collection,
+    getDocs,
+    doc,
+    getDoc
+} from "firebase/firestore";
 
 function PacientePerfil() {
     const { id } = useParams();
@@ -15,7 +23,9 @@ function PacientePerfil() {
     const [paciente, setPaciente] = useState(null);
     const [observacoes, setObservacoes] = useState([]);
     const [novaObs, setNovaObs] = useState("");
-    const [role, setRole] = useState(null);
+    const { user: authUser } = useAuth();
+    const [role, setRole] = useState("");
+    const podeAcessar = ["admin", "psicologo"].includes(role);
 
     const [psicologos, setPsicologos] = useState([]);
     const [psicologoResponsavel, setPsicologoResponsavel] = useState(null);
@@ -24,6 +34,36 @@ function PacientePerfil() {
     const labels = segment.labels;
     const tenantId = segment.tenant?.id;
     //const tenantId = tenant?.id;
+
+    useEffect(() => {
+        async function carregarRole() {
+            if (!authUser) return;
+
+            const tenantsSnapshot = await getDocs(collection(db, "tenants"));
+
+            for (const tenantDoc of tenantsSnapshot.docs) {
+                const userRef = doc(
+                    db,
+                    "tenants",
+                    tenantDoc.id,
+                    "usuarios",
+                    authUser.uid
+                );
+
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const data = userSnap.data();
+
+                    setRole(data.role || "");
+
+                    break;
+                }
+            }
+        }
+
+        carregarRole();
+    }, [authUser]);
 
     // observar autenticação
     useEffect(() => {
@@ -235,39 +275,43 @@ function PacientePerfil() {
                 </p>
             </Card>
 
-            <h2>Espaço para adcionar novas observações</h2>
-            <Card>
-                <h2 className="font-semibold mb-3">{labels.observacoes} Clínicas</h2>
+            {podeAcessar && (
+                <div>
+                    <h2>Espaço para adcionar novas observações</h2>
+                    <Card>
+                        <h2 className="font-semibold mb-3">{labels.observacoes} Clínicas</h2>
 
-                {observacoes.length > 0 ? (
-                    <div className="space-y-3">
-                        {observacoes.map(obs => (
-                            <div key={obs.id} className="border p-3 rounded bg-gray-50">
-                                <p className="text-xs text-gray-500">{obs.data}</p>
-                                <p className="text-sm">{obs.texto}</p>
+                        {observacoes.length > 0 ? (
+                            <div className="space-y-3">
+                                {observacoes.map(obs => (
+                                    <div key={obs.id} className="border p-3 rounded bg-gray-50">
+                                        <p className="text-xs text-gray-500">{obs.data}</p>
+                                        <p className="text-sm">{obs.texto}</p>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-sm text-gray-500">Nenhuma {labels.observacao} registrada.</p>
-                )}
+                        ) : (
+                            <p className="text-sm text-gray-500">Nenhuma {labels.observacao} registrada.</p>
+                        )}
 
-                <div className="mt-4">
-                    <textarea
-                        value={novaObs}
-                        onChange={(e) => setNovaObs(e.target.value)}
-                        className="w-full border rounded p-2 text-sm"
-                        placeholder="Adicionar nova observação..."
-                    />
+                        <div className="mt-4">
+                            <textarea
+                                value={novaObs}
+                                onChange={(e) => setNovaObs(e.target.value)}
+                                className="w-full border rounded p-2 text-sm"
+                                placeholder="Adicionar nova observação..."
+                            />
 
-                    <button
-                        onClick={salvarObservacao}
-                        className="mt-2 bg-blue-600 text-white px-4 py-2 rounded text-sm"
-                    >
-                        Salvar {labels.observacao}
-                    </button>
+                            <button
+                                onClick={salvarObservacao}
+                                className="mt-2 bg-blue-600 text-white px-4 py-2 rounded text-sm"
+                            >
+                                Salvar {labels.observacao}
+                            </button>
+                        </div>
+                    </Card>
                 </div>
-            </Card>
+            )}
         </div>
     );
 }

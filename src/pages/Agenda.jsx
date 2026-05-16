@@ -315,6 +315,23 @@ function Agenda() {
         });
     }
 
+    function consultaNoSlot(data, horario) {
+        return consultas.find(c => {
+            const d = normalizarData(c.data);
+            if (!d) return false;
+            const h =
+                d.getHours().toString().padStart(2, "0") +
+                ":" +
+                d.getMinutes().toString().padStart(2, "0");
+
+            return (
+                d.toDateString() === data.toDateString()
+                &&
+                h === horario
+            );
+        });
+    }
+
     async function salvarConsulta() {
         if (!pacienteSelecionado) return;
         const [h, m] = modalNovo.horario.split(":");
@@ -451,21 +468,22 @@ function Agenda() {
 `}
                                             onClick={() => {
                                                 if (!disponivel) return;
-                                                if (consultasSlot.length === 1) {
 
-                                                    setModalConsulta(
-                                                        consultasSlot[0]
-                                                    );
-
-                                                } else if (consultasSlot.length === 0) {
-
+                                                if (consultasSlot.length === 0) {
                                                     abrirNovo(dia, h);
-
                                                 }
                                             }}
                                         >
                                             {consultasSlot.map(consulta => (
                                                 <div
+                                                    onClick={(e) => {
+
+                                                        e.stopPropagation();
+
+                                                        setModalConsulta(consulta);
+
+                                                    }}
+
                                                     className={`
     ${coresStatus[consulta.status] || "bg-indigo-100"}
     rounded

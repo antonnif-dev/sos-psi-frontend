@@ -94,9 +94,9 @@ function LayoutPsicologia({ children }) {
 
             {/* MENU INFERIOR */}
             <nav className="fixed bottom-0 left-0 right-0 z-50 px-1 md:px-15 py-1">
-                <div className="bg-cyan-500 backdrop-blur-xl border border-cyan-100 rounded-3xl shadow-2xl px-4 py-4">
+                <div className="bg-emerald-400 backdrop-blur-xl border border-cyan-100 rounded-3xl shadow-2xl px-3 py-4">
 
-                    <div className="flex justify-center md:justify-around items-center flex-wrap md:flex-nowrap rounded-2xl gap-1 lg:gap-4">
+                    <div className="flex justify-center md:justify-around items-center flex-wrap md:flex-nowrap rounded-2xl gap-2 lg:gap-4">
 
                         {menu.map((item) => {
                             if (item.roles && !item.roles.includes(roleUsuario)) {
@@ -107,7 +107,7 @@ function LayoutPsicologia({ children }) {
                                 <Link
                                     key={item.path}
                                     to={item.path}
-                                    className="flex flex-col items-center justify-center min-w-[75px] gap-1 md:gap-5 text-slate-600 hover:text-cyan-700 transition"
+                                    className="flex flex-col items-center justify-center min-w-[50px] gap-1 md:gap-5 text-slate-600 hover:text-cyan-700 transition"
                                 >
                                     <span className="text-xs md:text-2xl font-medium text-center">
                                         {item.label}
@@ -119,7 +119,7 @@ function LayoutPsicologia({ children }) {
                         {/* PERFIL */}
                         <Link
                             to="/meu-perfil"
-                            className="flex flex-col items-center justify-center min-w-[75px] gap-1 text-slate-600 hover:text-cyan-700 transition"
+                            className="flex flex-col items-center justify-center min-w-[50px] gap-1 text-slate-600 hover:text-cyan-700 transition"
                         >
                             <UserPen size={20} />
                             <span className="text-xs font-medium">

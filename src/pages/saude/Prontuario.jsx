@@ -2,6 +2,14 @@ import { useEffect, useState } from "react";
 import { listarProntuarios, criarProntuario, editarProntuario, deletarProntuario } from "../../services/prontuarioService";
 import { listarSessoesRealizadas } from "../../services/agendaService";
 import Card from "../../components/Card";
+import { useAuth } from "../../hooks/useAuth";
+import { db } from "../../services/firebase";
+import {
+    collection,
+    getDocs,
+    doc,
+    getDoc
+} from "firebase/firestore";
 
 function CampoNumero({ label, value, setter, disabled }) {
     return (
@@ -24,6 +32,9 @@ function Prontuario() {
     const [observacoes, setObservacoes] = useState("");
     const [editando, setEditando] = useState(null);
     const [visualizando, setVisualizando] = useState(false);
+    const { user: authUser } = useAuth();
+    const [role, setRole] = useState("");
+    const isAdmin = role === "admin";
 
     const [sessoes, setSessoes] = useState([]);
     const [sessaoSelecionada, setSessaoSelecionada] = useState(null);
@@ -46,6 +57,36 @@ function Prontuario() {
     const [produtividade, setProdutividade] = useState("");
     const [interacaoSocial, setInteracaoSocial] = useState("");
     const [motivacao, setMotivacao] = useState("");
+
+    useEffect(() => {
+        async function carregarRole() {
+            if (!authUser) return;
+
+            const tenantsSnapshot = await getDocs(collection(db, "tenants"));
+
+            for (const tenantDoc of tenantsSnapshot.docs) {
+                const userRef = doc(
+                    db,
+                    "tenants",
+                    tenantDoc.id,
+                    "usuarios",
+                    authUser.uid
+                );
+
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const data = userSnap.data();
+
+                    setRole(data.role || "");
+
+                    break;
+                }
+            }
+        }
+
+        carregarRole();
+    }, [authUser]);
 
 
     async function carregar() {
@@ -316,64 +357,66 @@ function Prontuario() {
 
             </Card>
 
-            <div>
-                <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                    Histórico de sessões
-                </h2>
-                {prontuarios.length === 0 && (
-                    <Card>
-                        <p className="text-gray-500 text-sm">
-                            Nenhum prontuário registrado ainda.
-                        </p>
-                    </Card>
-                )}
+            {isAdmin && (
+                <div>
+                    <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                        Histórico de sessões
+                    </h2>
+                    {prontuarios.length === 0 && (
+                        <Card>
+                            <p className="text-gray-500 text-sm">
+                                Nenhum prontuário registrado ainda.
+                            </p>
+                        </Card>
+                    )}
 
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 
-                    {prontuarios.map(p => (
-                        <div
-                            key={p.id}
-                            className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition"
-                        >
-                            <p className="text-sm text-gray-500 mb-1">
-                                Paciente
-                            </p>
-                            <p className="font-medium text-gray-800 mb-3">
-                                {p.paciente}
-                            </p>
-                            <p className="text-sm text-gray-500 mb-1">
-                                Data da sessão
-                            </p>
+                        {prontuarios.map(p => (
+                            <div
+                                key={p.id}
+                                className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition"
+                            >
+                                <p className="text-sm text-gray-500 mb-1">
+                                    Paciente
+                                </p>
+                                <p className="font-medium text-gray-800 mb-3">
+                                    {p.paciente}
+                                </p>
+                                <p className="text-sm text-gray-500 mb-1">
+                                    Data da sessão
+                                </p>
 
-                            <p className="text-sm text-gray-700 mb-3">
-                                {p.dataSessao
-                                    ? new Date(p.dataSessao).toLocaleString("pt-BR")
-                                    : "Data não registrada"}
-                            </p>
-                            <p className="text-sm text-gray-500 mb-1">
-                                Observações
-                            </p>
-                            <p className="text-sm text-gray-700 whitespace-pre-line">
-                                {p.observacoes}
-                            </p>
-                            <div className="flex gap-3 mt-4">
-                                <button
-                                    onClick={() => visualizarProntuario(p)}
-                                    className="text-blue-600 text-sm hover:underline"
-                                >
-                                    Visualizar
-                                </button>
-                                <button
-                                    onClick={() => remover(p.id)}
-                                    className="text-red-600 text-sm hover:underline"
-                                >
-                                    Excluir
-                                </button>
+                                <p className="text-sm text-gray-700 mb-3">
+                                    {p.dataSessao
+                                        ? new Date(p.dataSessao).toLocaleString("pt-BR")
+                                        : "Data não registrada"}
+                                </p>
+                                <p className="text-sm text-gray-500 mb-1">
+                                    Observações
+                                </p>
+                                <p className="text-sm text-gray-700 whitespace-pre-line">
+                                    {p.observacoes}
+                                </p>
+                                <div className="flex gap-3 mt-4">
+                                    <button
+                                        onClick={() => visualizarProntuario(p)}
+                                        className="text-blue-600 text-sm hover:underline"
+                                    >
+                                        Visualizar
+                                    </button>
+                                    <button
+                                        onClick={() => remover(p.id)}
+                                        className="text-red-600 text-sm hover:underline"
+                                    >
+                                        Excluir
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
         </div>
     );

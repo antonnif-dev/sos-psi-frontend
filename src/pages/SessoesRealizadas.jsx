@@ -2,11 +2,21 @@ import { useEffect, useState } from "react";
 import { listarConsultas } from "../services/agendaService";
 import { listarPacientes } from "../services/pacientesService";
 import Card from "../components/Card";
+import { auth, db } from "../services/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import {
+    collection,
+    getDocs,
+    doc,
+    getDoc
+} from "firebase/firestore";
 
 function SessoesRealizadas() {
 
     const [consultas, setConsultas] = useState([]);
     const [pacientes, setPacientes] = useState([]);
+    const [user, setUser] = useState(null);
+    const [role, setRole] = useState("");
 
     const [buscaPaciente, setBuscaPaciente] = useState("");
     const [dataInicio, setDataInicio] = useState("");
@@ -19,17 +29,78 @@ function SessoesRealizadas() {
     const [mensagem, setMensagem] = useState("");
     const [tipoMensagem, setTipoMensagem] = useState("");
 
+    useEffect(() => {
+
+        const unsubscribe = onAuthStateChanged(auth, async (u) => {
+            if (u) {
+                const tenantsSnapshot = await getDocs(
+                    collection(db, "tenants")
+                );
+
+                for (const tenantDoc of tenantsSnapshot.docs) {
+                    const userRef = doc(
+                        db,
+                        "tenants",
+                        tenantDoc.id,
+                        "usuarios",
+                        u.uid
+                    );
+
+                    const userSnap = await getDoc(userRef);
+
+                    if (userSnap.exists()) {
+                        const data = userSnap.data();
+                        setRole(data.role || "");
+                        break;
+                    }
+                }
+
+                setUser({
+                    uid: u.uid,
+                    email: u.email
+                });
+
+            } else {
+                setUser(null);
+            }
+        });
+
+        return () => unsubscribe();
+
+    }, []);
+
     async function carregar() {
+        if (!user) return;
+
         const dados = await listarConsultas();
         const pacientesLista = await listarPacientes();
 
-        setConsultas(dados);
-        setPacientes(pacientesLista);
+        if (role === "admin") {
+            setConsultas(dados);
+            setPacientes(pacientesLista);
+
+        } else {
+            const pacientesDoPsicologo =
+                pacientesLista.filter(
+                    p => p.psicologoUid === user.uid
+                );
+
+            const idsPacientes =
+                pacientesDoPsicologo.map(p => p.id);
+
+            const consultasFiltradas =
+                dados.filter(c =>
+                    idsPacientes.includes(c.pacienteId)
+                );
+
+            setConsultas(consultasFiltradas);
+            setPacientes(pacientesDoPsicologo);
+        }
     }
 
     useEffect(() => {
         carregar();
-    }, []);
+    }, [user, role]);
 
     function nomePaciente(id) {
         const p = pacientes.find(p => p.id === id);

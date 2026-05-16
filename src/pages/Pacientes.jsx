@@ -7,19 +7,25 @@ import {
 } from "../services/pacientesService";
 import Card from "../components/Card";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../services/firebase";
+import { auth, db } from "../services/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useSegment } from "../hooks/useSegment";
+import {
+    collection,
+    getDocs,
+    doc,
+    getDoc
+} from "firebase/firestore";
 
 function Pacientes() {
     const [pacientes, setPacientes] = useState([]);
     const [busca, setBusca] = useState("");
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
+    const [role, setRole] = useState("");
 
-    
     const segment = useSegment();
-    
+
     const labels = segment.labels;
 
     const [novoPaciente, setNovoPaciente] = useState({
@@ -54,16 +60,53 @@ function Pacientes() {
     async function carregarPacientes() {
         if (!user) return;
         const data = await listarPacientes();
-        setPacientes(data);
+
+        if (role === "admin") {
+            setPacientes(data);
+        } else {
+            const apenasDoPsicologo = data.filter(
+                p => p.psicologoUid === user.uid
+            );
+
+            setPacientes(apenasDoPsicologo);
+        }
     }
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (u) => {
+        const unsubscribe = onAuthStateChanged(auth, async (u) => {
             if (u) {
+
+                const tenantsSnapshot = await getDocs(
+                    collection(db, "tenants")
+                );
+
+                for (const tenantDoc of tenantsSnapshot.docs) {
+
+                    const userRef = doc(
+                        db,
+                        "tenants",
+                        tenantDoc.id,
+                        "usuarios",
+                        u.uid
+                    );
+
+                    const userSnap = await getDoc(userRef);
+
+                    if (userSnap.exists()) {
+
+                        const data = userSnap.data();
+
+                        setRole(data.role || "");
+
+                        break;
+                    }
+                }
+
                 setUser({
                     uid: u.uid,
                     email: u.email
                 });
+
             } else {
                 setUser(null);
                 setPacientes([]);
@@ -75,7 +118,7 @@ function Pacientes() {
 
     useEffect(() => {
         carregarPacientes();
-    }, [user]);
+    }, [user, role]);
 
     if (!segment || !segment.labels) return null;
 
@@ -84,11 +127,17 @@ function Pacientes() {
     );
 
     async function handleCriar() {
+        if (!user) {
+            alert("Usuário não carregado");
+            return;
+        }
         if (!novoPaciente.nome) return;
+
         const telefoneFormatado = `55${novoPaciente.ddd}${novoPaciente.telefone}`;
         await criarPaciente({
             ...novoPaciente,
-            telefone: telefoneFormatado
+            telefone: telefoneFormatado,
+            psicologoUid: user.uid
         });
 
         setNovoPaciente({

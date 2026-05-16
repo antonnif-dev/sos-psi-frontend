@@ -29,20 +29,10 @@ export const segmentConfig = {
             { label: "Agenda", path: "/agenda" },
             { label: "Pacientes", path: "/pacientes" },
             { label: "Sessões", path: "/sessoes" },
-            { label: "Financeiro", path: "/financeiro" },
-            { label: "Documentos", path: "/documentos" },
-            { label: "Mapa da Evolucao", path: "/mapa-evolucao" },
-            { label: "Mural", path: "/mural" },
             {
                 label: "Prontuário",
                 path: "/prontuario",
                 roles: ["admin", "psicologo"]
-            },
-            {
-                label: "Prescrições",
-                path: "/prescricoes",
-                roles: ["admin", "medico"],
-                profissoes: ["medico"]
             },
             {
                 label: "Anamnese",
@@ -50,6 +40,16 @@ export const segmentConfig = {
                 roles: ["admin", "psicologo"],
                 profissoes: ["psicologo"]
             },
+            { label: "Mapa da Evolucao", path: "/mapa-evolucao" },
+            { label: "Documentos", path: "/documentos" },
+            {
+                label: "Prescrições",
+                path: "/prescricoes",
+                roles: ["admin", "medico"],
+                profissoes: ["medico"]
+            },
+            { label: "Financeiro", path: "/financeiro" },
+            { label: "Mural", path: "/mural" },
             /*
             {
                 label: "Prescrições",

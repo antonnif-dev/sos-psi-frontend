@@ -2,6 +2,14 @@ import { useEffect, useState } from "react";
 import { listarPagamentos, criarPagamento, editarPagamento, deletarPagamento } from "../services/financeiroService";
 import Card from "../components/Card";
 import { listarPacientes } from "../services/pacientesService";
+import { useAuth } from "../hooks/useAuth";
+import { db } from "../services/firebase";
+import {
+   collection,
+   getDocs,
+   doc,
+   getDoc
+} from "firebase/firestore";
 
 function Financeiro() {
    const [pagamentos, setPagamentos] = useState([]);
@@ -11,6 +19,9 @@ function Financeiro() {
    const [pacientes, setPacientes] = useState([]);
    const [sugestoes, setSugestoes] = useState([]);
    const [modalTipo, setModalTipo] = useState(null);
+   const { user: authUser } = useAuth();
+   const [role, setRole] = useState("");
+   const isAdmin = role === "admin";
 
    const [filtroMes, setFiltroMes] = useState("");
    const [filtroAno, setFiltroAno] = useState("");
@@ -45,8 +56,35 @@ function Financeiro() {
    }
 
    async function carregar() {
+
+      if (!authUser) return;
+
       const dados = await listarPagamentos();
-      setPagamentos(dados);
+      const pacientesLista = await listarPacientes();
+
+      if (role === "admin") {
+
+         setPagamentos(dados);
+         setPacientes(pacientesLista);
+
+      } else {
+
+         const pacientesDoPsicologo =
+            pacientesLista.filter(
+               p => p.psicologoUid === authUser.uid
+            );
+
+         const nomesPacientes =
+            pacientesDoPsicologo.map(p => p.nome);
+
+         const pagamentosFiltrados =
+            dados.filter(p =>
+               nomesPacientes.includes(p.paciente)
+            );
+
+         setPagamentos(pagamentosFiltrados);
+         setPacientes(pacientesDoPsicologo);
+      }
    }
 
    function buscarPaciente(texto) {
@@ -62,19 +100,45 @@ function Financeiro() {
    }
 
    useEffect(() => {
-      carregar();
-      async function carregarPacientes() {
-         const dados = await listarPacientes();
-         setPacientes(dados);
+      async function carregarRole() {
+         if (!authUser) return;
+
+         const tenantsSnapshot = await getDocs(collection(db, "tenants"));
+
+         for (const tenantDoc of tenantsSnapshot.docs) {
+            const userRef = doc(
+               db,
+               "tenants",
+               tenantDoc.id,
+               "usuarios",
+               authUser.uid
+            );
+
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+               const data = userSnap.data();
+
+               setRole(data.role || "");
+
+               break;
+            }
+         }
       }
-      carregarPacientes();
-   }, []);
+
+      carregarRole();
+   }, [authUser]);
+
+   useEffect(() => {
+      carregar();
+   }, [authUser, role]);
 
    async function handleSubmit(e) {
       e.preventDefault();
       const data = {
          paciente,
-         valor
+         valor,
+         psicologoUid: authUser.uid
       };
       if (editando) {
          await editarPagamento(editando, data);
@@ -155,46 +219,48 @@ function Financeiro() {
             </p>
          </div>
 
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div
-               onClick={() => setModalTipo("todos")}
-               className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm cursor-pointer hover:shadow-md transition"
-            >
-               <p className="text-sm text-gray-500">
-                  Pagamentos registrados
-               </p>
+         {isAdmin && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+               <div
+                  onClick={() => setModalTipo("todos")}
+                  className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm cursor-pointer hover:shadow-md transition"
+               >
+                  <p className="text-sm text-gray-500">
+                     Pagamentos registrados
+                  </p>
 
-               <p className="text-3xl font-semibold text-gray-800 mt-2">
-                  {pagamentos.length}
-               </p>
+                  <p className="text-3xl font-semibold text-gray-800 mt-2">
+                     {pagamentos.length}
+                  </p>
+               </div>
+
+               <div
+                  onClick={() => setModalTipo("realizados")}
+                  className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm cursor-pointer hover:shadow-md transition"
+               >
+                  <p className="text-sm text-gray-500">
+                     Faturamento total
+                  </p>
+
+                  <p className="text-3xl font-semibold text-green-600 mt-2">
+                     R$ {total}
+                  </p>
+               </div>
+
+               <div
+                  onClick={() => setModalTipo("abertos")}
+                  className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm cursor-pointer hover:shadow-md transition"
+               >
+                  <p className="text-sm text-gray-500">
+                     Pagamentos em aberto
+                  </p>
+
+                  <p className="text-3xl font-semibold text-yellow-600 mt-2">
+                     {pagamentosAbertos.length}
+                  </p>
+               </div>
             </div>
-
-            <div
-               onClick={() => setModalTipo("realizados")}
-               className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm cursor-pointer hover:shadow-md transition"
-            >
-               <p className="text-sm text-gray-500">
-                  Faturamento total
-               </p>
-
-               <p className="text-3xl font-semibold text-green-600 mt-2">
-                  R$ {total}
-               </p>
-            </div>
-
-            <div
-               onClick={() => setModalTipo("abertos")}
-               className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm cursor-pointer hover:shadow-md transition"
-            >
-               <p className="text-sm text-gray-500">
-                  Pagamentos em aberto
-               </p>
-
-               <p className="text-3xl font-semibold text-yellow-600 mt-2">
-                  {pagamentosAbertos.length}
-               </p>
-            </div>
-         </div>
+         )}
 
          <Card>
             <div className="mb-4">

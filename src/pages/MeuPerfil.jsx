@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { db, auth } from "../services/firebase";
 import {
@@ -9,13 +10,20 @@ import {
     updateDoc,
     addDoc
 } from "firebase/firestore";
-import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { criarUsuario } from "../services/meuPerfilService";
+import {
+    updatePassword,
+    reauthenticateWithCredential,
+    EmailAuthProvider,
+    sendPasswordResetEmail
+} from "firebase/auth";
+import { PLANOS } from "../config/planos.config";
 
 export default function MeuPerfil() {
     const { user: authUser } = useAuth(); // usuário logado do Firebase Auth
-
+    const navigate = useNavigate();
     const [tenantId, setTenantId] = useState(null);
+    const [plano, setPlano] = useState("");
     const [perfil, setPerfil] = useState({
         nome: "",
         email: "",
@@ -36,12 +44,17 @@ export default function MeuPerfil() {
     });
 
     const [senhaAtual, setSenhaAtual] = useState("");
-    const [novaSenha, setNovaSenha] = useState("");
 
     const [loading, setLoading] = useState(true);
     const [role, setRole] = useState(""); // role do usuário
 
+    const funcionalidades =
+        PLANOS[plano]?.funcionalidades || {};
+
     const isAdmin = role === "admin";
+
+    const podeCriarUsuarios =
+        isAdmin && funcionalidades.hierarquiaEquipe;
 
     // --- Carregar perfil e role ---
     useEffect(() => {
@@ -56,6 +69,8 @@ export default function MeuPerfil() {
 
                 if (userSnap.exists()) {
                     setTenantId(tenantDoc.id);
+                    const tenantData = tenantDoc.data();
+                    setPlano(tenantData.plano || "basico");
                     const data = userSnap.data();
                     setPerfil({
                         nome: data.nome || "",
@@ -64,7 +79,7 @@ export default function MeuPerfil() {
                         profissionalId: data.profissionalId || "",
                         role: data.role || ""
                     });
-                    setRole(data.role || "user"); // define role
+                    setRole(data.role || "user");
                     break;
                 }
             }
@@ -101,21 +116,37 @@ export default function MeuPerfil() {
 
     // --- Alterar senha ---
     async function alterarSenha() {
-        if (!senhaAtual || !novaSenha) {
-            alert("Preencha a senha atual e a nova senha");
+        if (!senhaAtual) {
+            alert("Informe sua senha atual");
             return;
         }
 
         try {
-            const credential = EmailAuthProvider.credential(authUser.email, senhaAtual);
+            // Reautentica
+            const credential = EmailAuthProvider.credential(
+                authUser.email,
+                senhaAtual
+            );
+
             await reauthenticateWithCredential(authUser, credential);
-            await updatePassword(authUser, novaSenha);
+
+            // Envia email de redefinição
+            await sendPasswordResetEmail(auth, authUser.email);
+
             setSenhaAtual("");
-            setNovaSenha("");
-            alert("Senha alterada com sucesso!");
+
+            // Logout imediato
+            await auth.signOut();
+
+            alert(
+                "Enviamos um email para redefinição da senha. Faça login novamente após redefinir."
+            );
+
+            navigate("/");
+
         } catch (err) {
             console.error(err);
-            alert("Erro ao alterar senha: " + err.message);
+            alert("Erro: " + err.message);
         }
     }
 
@@ -199,25 +230,19 @@ export default function MeuPerfil() {
                     onChange={(e) => setSenhaAtual(e.target.value)}
                     placeholder="Senha atual"
                     className="border p-2 rounded"
-                />
-                <input
-                    type="password"
-                    value={novaSenha}
-                    onChange={(e) => setNovaSenha(e.target.value)}
-                    placeholder="Nova senha"
-                    className="border p-2 rounded"
+                    autoComplete="new-password"
                 />
 
                 <button
                     onClick={alterarSenha}
                     className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
                 >
-                    Alterar Senha
+                    Enviar Email de Redefinição
                 </button>
             </div>
 
             {/* --- Criar usuário (admin) --- */}
-            {isAdmin && (
+            {podeCriarUsuarios && (
                 <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
                     <h2 className="font-semibold text-lg">Criar Novo Usuário</h2>
 
@@ -250,7 +275,7 @@ export default function MeuPerfil() {
                         placeholder="Telefone"
                         className="border p-2 rounded"
                     />
-                    {isAdmin && (
+                    {podeCriarUsuarios && (
                         <select
                             name="role"
                             value={novoUsuario.role}
