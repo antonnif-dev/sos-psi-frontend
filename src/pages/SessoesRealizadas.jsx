@@ -265,10 +265,6 @@ function SessoesRealizadas() {
 
     return (
         <div className="space-y-8">
-            <h1 className="text-xl font-semibold">
-                Atendimentos
-            </h1>
-
             {/* MÉTRICAS */}
             <div className="grid md:grid-cols-3 gap-4">
                 <Card>

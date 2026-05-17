@@ -210,15 +210,6 @@ function Financeiro() {
 
    return (
       <div className="space-y-8">
-         <div>
-            <h1 className="text-2xl font-semibold text-gray-800">
-               Financeiro
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-               Controle de pagamentos das sessões
-            </p>
-         </div>
-
          {isAdmin && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                <div

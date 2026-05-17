@@ -69,13 +69,17 @@ function LayoutJuridico({ children }) {
                         if (item.roles && !item.roles.includes(roleUsuario)) {
                             return null;
                         }
+                        const Icon = item.icon;
 
                         return (
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className="px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition font-medium"
+                                className="flex flex-col md:flex-row gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition font-medium"
                             >
+                                {Icon && (
+                                    <Icon className="w-5 h-5 md:w-6 md:h-6" />
+                                )}
                                 {item.label}
                             </Link>
                         );
@@ -89,17 +93,6 @@ function LayoutJuridico({ children }) {
                         <UserPen size={18} />
                         Perfil
                     </Link>
-
-                    {/* CONFIG */}
-                    {roleUsuario === "admin" && (
-                        <Link
-                            to="/configuracoes"
-                            className="px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition flex items-center gap-3"
-                        >
-                            <Settings size={18} />
-                            Configurações
-                        </Link>
-                    )}
                 </nav>
             </aside>
 
@@ -122,14 +115,14 @@ function LayoutJuridico({ children }) {
             <div className="flex flex-col flex-1 min-w-0">
 
                 {/* TOPBAR */}
-                <header className="h-32 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-8 flex items-center justify-between">
+                <header className="h-auto p-2 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-8 flex items-center justify-between">
 
                     {/* EMPRESA */}
                     <div>
                         <h1 className="font-bold text-slate-800 text-xl">
                             {tenant.nome}
                         </h1>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-slate-500 flex flex-wrap">
                             Advocacia, contabilidade e consultoria estratégica
                         </p>
                     </div>
@@ -146,6 +139,16 @@ function LayoutJuridico({ children }) {
 
                     {/* AÇÕES */}
                     <div className="flex items-center gap-4">
+                        {/* CONFIG */}
+                        {roleUsuario === "admin" && (
+                            <Link
+                                to="/configuracoes"
+                                className="px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition flex items-center gap-3"
+                            >
+                                <Settings size={18} />
+                                Configurações
+                            </Link>
+                        )}
                         <NotificationBell />
                         <div className="w-px h-6 bg-slate-300"></div>
                         <LogoutButton />

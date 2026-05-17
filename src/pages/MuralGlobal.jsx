@@ -20,10 +20,10 @@ export default function MuralGlobalPage() {
 
     return (
         <div
-            className={`min-h-screen p-6 ${config?.theme?.background || "bg-gray-100"
+            className={`p-2 ${config?.theme?.background || "bg-gray-100"
                 }`}
         >
-            <div className="max-w-7xl mx-auto">
+            <div className="">
                 {/* 
                 <h1 className="text-2xl font-bold mb-6">
                     {config?.labels?.mural || "Mural"}

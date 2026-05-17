@@ -93,15 +93,16 @@ function LayoutPsicologia({ children }) {
             </main>
 
             {/* MENU INFERIOR */}
-            <nav className="fixed bottom-0 left-0 right-0 z-50 px-1 md:px-15 py-1">
+            <nav className="fixed bottom-0 left-0 right-0 z-50 px-3 py-1 flex justify-center">
                 <div className="bg-emerald-400 backdrop-blur-xl border border-cyan-100 rounded-3xl shadow-2xl px-3 py-4">
 
-                    <div className="flex justify-center md:justify-around items-center flex-wrap md:flex-nowrap rounded-2xl gap-2 lg:gap-4">
+                    <div className="flex justify-center md:justify-around items-center flex-wrap md:flex-nowrap rounded-2xl gap-3 lg:gap-15">
 
                         {menu.map((item) => {
                             if (item.roles && !item.roles.includes(roleUsuario)) {
                                 return null;
                             }
+                            const Icon = item.icon;
 
                             return (
                                 <Link
@@ -109,23 +110,15 @@ function LayoutPsicologia({ children }) {
                                     to={item.path}
                                     className="flex flex-col items-center justify-center min-w-[50px] gap-1 md:gap-5 text-slate-600 hover:text-cyan-700 transition"
                                 >
-                                    <span className="text-xs md:text-2xl font-medium text-center">
+                                    {Icon && (
+                                        <Icon className="w-5 h-5 md:w-6 md:h-6" />
+                                    )}
+                                    <span className="text-xs md:text-lg font-medium text-center">
                                         {item.label}
                                     </span>
                                 </Link>
                             );
                         })}
-
-                        {/* PERFIL */}
-                        <Link
-                            to="/meu-perfil"
-                            className="flex flex-col items-center justify-center min-w-[50px] gap-1 text-slate-600 hover:text-cyan-700 transition"
-                        >
-                            <UserPen size={20} />
-                            <span className="text-xs font-medium">
-                                Perfil
-                            </span>
-                        </Link>
 
                     </div>
 

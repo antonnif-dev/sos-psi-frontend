@@ -176,69 +176,70 @@ export default function MeuPerfil() {
     if (loading) return <p>Carregando...</p>;
 
     return (
-        <div className="space-y-8 max-w-lg mx-auto p-4">
-            <h1 className="text-2xl font-bold">Meu Perfil</h1>
-
+        <div className="space-y-8">
             {/* --- Perfil --- */}
-            <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
-                <h2 className="font-semibold text-lg">Informações Pessoais</h2>
+            <div className="flex flex-col md:flex-row p-6 justify-around">
+                <div className="bg-white rounded shadow flex flex-col gap-4 md:w-xl">
+                    <h2 className="font-semibold text-lg">Informações Pessoais</h2>
 
-                <input
-                    name="nome"
-                    value={perfil.nome}
-                    onChange={handleChange}
-                    placeholder="Nome"
-                    className="border p-2 rounded"
-                />
-                <input
-                    name="email"
-                    value={perfil.email}
-                    onChange={handleChange}
-                    placeholder="Email"
-                    className="border p-2 rounded"
-                />
-                <input
-                    name="telefone"
-                    value={perfil.telefone}
-                    onChange={handleChange}
-                    placeholder="Telefone"
-                    className="border p-2 rounded"
-                />
-                <input
-                    name="profissionalId"
-                    value={perfil.profissionalId || ""}
-                    onChange={handleChange}
-                    placeholder="Registro Profissional"
-                    className="border p-2 rounded"
-                />
+                    <input
+                        name="nome"
+                        value={perfil.nome}
+                        onChange={handleChange}
+                        placeholder="Nome"
+                        className="border p-2 rounded"
+                    />
+                    <input
+                        name="email"
+                        value={perfil.email}
+                        onChange={handleChange}
+                        placeholder="Email"
+                        className="border p-2 rounded"
+                    />
+                    <input
+                        name="telefone"
+                        value={perfil.telefone}
+                        onChange={handleChange}
+                        placeholder="Telefone"
+                        className="border p-2 rounded"
+                    />
+                    <input
+                        name="profissionalId"
+                        value={perfil.profissionalId || ""}
+                        onChange={handleChange}
+                        placeholder="Registro Profissional"
+                        className="border p-2 rounded"
+                    />
 
-                <button
-                    onClick={salvarPerfil}
-                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-                >
-                    Salvar Perfil
-                </button>
-            </div>
+                    <button
+                        onClick={salvarPerfil}
+                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                    >
+                        Salvar Perfil
+                    </button>
+                </div>
 
-            {/* --- Alterar senha --- */}
-            <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
-                <h2 className="font-semibold text-lg">Alterar Senha</h2>
+                {/* --- Alterar senha --- */}
+                <div className="bg-white rounded shadow flex flex-col gap-4 md:w-xl">
+                    <h2 className="font-semibold text-lg">Alterar Senha</h2>
 
-                <input
-                    type="password"
-                    value={senhaAtual}
-                    onChange={(e) => setSenhaAtual(e.target.value)}
-                    placeholder="Senha atual"
-                    className="border p-2 rounded"
-                    autoComplete="new-password"
-                />
+                    <input
+                        type="password"
+                        value={senhaAtual}
+                        onChange={(e) => setSenhaAtual(e.target.value)}
+                        placeholder="Senha atual"
+                        className="border p-2 rounded"
+                        autoComplete="new-password"
+                    />
 
-                <button
-                    onClick={alterarSenha}
-                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-                >
-                    Enviar Email de Redefinição
-                </button>
+                    <button
+                        onClick={alterarSenha}
+                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                    >
+                        Enviar Email de Redefinição
+                    </button>
+                </div>
+
             </div>
 
             {/* --- Criar usuário (admin) --- */}

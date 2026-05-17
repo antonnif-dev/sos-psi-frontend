@@ -53,17 +53,16 @@ function Dashboard() {
                 )}
 
                 {tenant?.segmento === "profissionais" && (
-                    <section className="px-6 md:px-10 pt-2">
+                    <section className="">
                         <div className="overflow-hidden rounded-[2.5rem] bg-white border border-slate-200 shadow-2xl">
                             
-                            <div className="z-10 p-8 md:p-12">
+                            <div className="z-10 p-4 md:p-12">
                                 <p className="uppercase tracking-[0.25em] text-sm text-amber-600 font-semibold mb-3">
                                     Estratégia, autoridade e gestão profissional
                                 </p>
 
                                 <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 leading-tight max-w-4xl">
-                                    Plataforma premium para operações jurídicas,
-                                    contábeis e consultivas
+                                    Plataforma premium para operações jurídicas
                                 </h2>
 
                                 <p className="text-lg text-slate-600 max-w-3xl leading-relaxed">

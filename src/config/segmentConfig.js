@@ -1,3 +1,22 @@
+import {
+    LayoutDashboard,
+    CalendarDays,
+    Users,
+    ClipboardList,
+    FileText,
+    CircleDollarSign,
+    Activity,
+    Stethoscope,
+    InfinityIcon,
+    FileMinus,
+    Presentation,
+    UserPen,
+    RefreshCcw,
+    AlarmClock,
+    NotebookPen,
+    ShieldPlus,
+} from "lucide-react";
+
 export const segmentConfig = {
     // psicólogo, terapeuta, nutricionista, fisioterapeuta, fonoaudiólogos
     saude: {
@@ -25,37 +44,35 @@ export const segmentConfig = {
         },
 
         menu: [
-            { label: "Dashboard", path: "/dashboard" },
-            { label: "Agenda", path: "/agenda" },
-            { label: "Pacientes", path: "/pacientes" },
-            { label: "Sessões", path: "/sessoes" },
+            { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+            { label: "Pacientes", path: "/pacientes", icon: Users },
+            { label: "Agenda", path: "/agenda", icon: CalendarDays },
+            { label: "Sessões", path: "/sessoes", icon: ClipboardList },
             {
                 label: "Prontuário",
                 path: "/prontuario",
+                icon: FileText,
                 roles: ["admin", "psicologo"]
             },
             {
                 label: "Anamnese",
                 path: "/anamnese",
+                icon: Activity,
                 roles: ["admin", "psicologo"],
                 profissoes: ["psicologo"]
             },
-            { label: "Mapa da Evolucao", path: "/mapa-evolucao" },
-            { label: "Documentos", path: "/documentos" },
+            { label: "Documentos", path: "/documentos", icon: FileMinus },
+            { label: "Mapa da Evolucao", path: "/mapa-evolucao", icon: RefreshCcw },
             {
                 label: "Prescrições",
                 path: "/prescricoes",
+                icon: Stethoscope,
                 roles: ["admin", "medico"],
                 profissoes: ["medico"]
             },
-            { label: "Financeiro", path: "/financeiro" },
-            { label: "Mural", path: "/mural" },
-            /*
-            {
-                label: "Prescrições",
-                path: "/prescricoes",
-                profissao: ["medico"]
-            },*/
+            { label: "Financeiro", path: "/financeiro", icon: CircleDollarSign },
+            { label: "Mural", path: "/mural", icon: Presentation },
+            { label: "Perfil", path: "/meu-perfil", icon: UserPen },
         ]
     },
 
@@ -84,15 +101,15 @@ export const segmentConfig = {
         },
 
         menu: [
-            { label: "Dashboard", path: "/dashboard" },
-            { label: "Agenda", path: "/agenda" },
-            { label: "Clientes", path: "/pacientes" },
-            { label: "Atendimentos", path: "/sessoes" },
-            { label: "Financeiro", path: "/financeiro" },
-            { label: "Documentos", path: "/documentos" },
-            { label: "Prazos", path: "/prazos" },
-            { label: "Processos", path: "/processos" },
-            { label: "Relatórios", path: "/relatorios" },
+            { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+            { label: "Agenda", path: "/agenda", icon: CalendarDays },
+            { label: "Clientes", path: "/pacientes", icon: Users },
+            { label: "Atendimentos", path: "/sessoes", icon: ClipboardList },
+            { label: "Financeiro", path: "/financeiro", icon: CircleDollarSign },
+            { label: "Documentos", path: "/documentos", icon: FileMinus },
+            { label: "Prazos", path: "/prazos", icon: AlarmClock },
+            { label: "Processos", path: "/processos", icon: ShieldPlus },
+            { label: "Relatórios", path: "/relatorios", icon: NotebookPen },
         ]
     },
 

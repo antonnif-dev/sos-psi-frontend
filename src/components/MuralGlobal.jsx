@@ -138,7 +138,7 @@ function MuralGlobal({ tenantNome, expandidoPadrao = false }) {
             className={`
         ${expandidoPadrao ? "relative" : "fixed bottom-0 right-2 md:right-5"}
         bg-white border shadow-xl
-        ${expandidoPadrao ? "w-full max-w-6xl mx-auto" : "w-[70%] md:w-[500px]"}
+        ${expandidoPadrao ? "w-full max-w-8xl mx-auto" : "w-[70%] md:w-[500px]"}
         transition-all
         ${maximizado ? "h-[70vh]" : "h-[90px]"}
     `}

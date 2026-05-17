@@ -154,9 +154,9 @@ export default function Configuracoes() {
     return (
 
         <div className="space-y-5">
-            <div className="space-y-8 flex flex-col md:flex-row justify-center items-center md:gap-5 lg:gap-10">
+            <div className="space-y-8 flex flex-col md:flex-row justify-center items-center md:gap-5 lg:gap-15">
 
-                <div className="bg-white p-6 rounded shadow flex flex-col gap-4 max-w-md">
+                <div className="bg-white p-2 rounded-[0.5rem] shadow flex flex-col gap-4 w-sm">
 
                     <h2 className="font-semibold text-lg">
                         Informações da Clínica
@@ -180,7 +180,7 @@ export default function Configuracoes() {
 
                 </div>
 
-                <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
+                <div className="bg-white p-2 rounded-[0.5rem] shadow flex flex-col gap-4">
 
                     <h2 className="font-semibold text-lg">
                         Disponibilidade semanal

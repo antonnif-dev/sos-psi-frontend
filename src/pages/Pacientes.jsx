@@ -184,10 +184,6 @@ function Pacientes() {
         <div className="space-y-6">
 
             <div>
-                <h1 className="text-2xl font-semibold text-gray-800">
-                    {labels.pacientes}
-                </h1>
-
                 <p className="text-sm text-gray-500">
                     {pacientes.length} {labels.paciente}(s) cadastrados
                 </p>

@@ -68,6 +68,7 @@ function LayoutEstetica({ children }) {
                         if (item.roles && !item.roles.includes(roleUsuario)) {
                             return null;
                         }
+                        const Icon = item.icon;
 
                         return (
                             <Link
@@ -138,6 +139,7 @@ function LayoutEstetica({ children }) {
                             if (item.roles && !item.roles.includes(roleUsuario)) {
                                 return null;
                             }
+                            const Icon = item.icon;
 
                             return (
                                 <Link
