@@ -113,8 +113,7 @@ export const segmentConfig = {
             { label: "Documentos", path: "/documentos", icon: FileMinus },
             { label: "Prazos", path: "/prazos", icon: AlarmClock },
             { label: "Processos", path: "/processos", icon: ShieldPlus },
-            { label: "Relatórios", path: "/relatorios", icon: NotebookPen },
-            { label: "Relatórios", path: "/anamnese", icon: Activity },
+            { label: "Relatórios", path: "/anamnese", icon: NotebookPen },
         ]
     },
 
