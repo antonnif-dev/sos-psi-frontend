@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import Card from "../../components/Card";
+import { useAuth } from "../../hooks/useAuth";
+
 import { listarPacientes as listarClientes } from "../../services/pacientesService";
+
 import {
     listarPrazos,
     criarPrazo,
@@ -15,26 +18,38 @@ function Prazos() {
     const [descricao, setDescricao] = useState("");
     const [dataLimite, setDataLimite] = useState("");
     const [prioridade, setPrioridade] = useState("");
+    const [tribunal, setTribunal] = useState("");
+    const [numeroProcesso, setNumeroProcesso] = useState("");
+    const [linkTribunal, setLinkTribunal] = useState("");
+    const [status, setStatus] = useState("Pendente");
     const [editando, setEditando] = useState(null);
     const [sugestoes, setSugestoes] = useState([]);
+    const { user } = useAuth();
 
     async function carregar() {
+
         const dados = await listarPrazos();
+
         setPrazos(dados);
     }
 
     useEffect(() => {
+
         carregar();
 
         async function carregarClientes() {
+
             const dados = await listarClientes();
+
             setClientes(dados);
         }
 
         carregarClientes();
+
     }, []);
 
     function buscarCliente(texto) {
+
         setCliente(texto);
 
         if (!texto) {
@@ -50,71 +65,130 @@ function Prazos() {
     }
 
     async function handleSubmit(e) {
+
         e.preventDefault();
 
         const data = {
             cliente,
             descricao,
             dataLimite,
-            prioridade
+            prioridade,
+            tribunal,
+            numeroProcesso,
+            linkTribunal,
+            status,
+            psicologoId: user?.uid || null
         };
 
         if (editando) {
+
             await editarPrazo(editando, data);
+
         } else {
+
             await criarPrazo(data);
         }
 
-        setCliente("");
-        setDescricao("");
-        setDataLimite("");
-        setPrioridade("");
-        setEditando(null);
+        limparFormulario();
 
         carregar();
     }
 
+    function limparFormulario() {
+
+        setCliente("");
+
+        setDescricao("");
+
+        setDataLimite("");
+
+        setPrioridade("");
+
+        setTribunal("");
+
+        setNumeroProcesso("");
+
+        setLinkTribunal("");
+
+        setStatus("Pendente");
+
+        setEditando(null);
+    }
+
     function iniciarEdicao(p) {
-        setCliente(p.cliente);
-        setDescricao(p.descricao);
-        setDataLimite(p.dataLimite);
-        setPrioridade(p.prioridade);
+
+        setCliente(p.cliente || "");
+
+        setDescricao(p.descricao || "");
+
+        setDataLimite(p.dataLimite || "");
+
+        setPrioridade(p.prioridade || "");
+
+        setTribunal(p.tribunal || "");
+
+        setNumeroProcesso(p.numeroProcesso || "");
+
+        setLinkTribunal(p.linkTribunal || "");
+
+        setStatus(p.status || "Pendente");
+
         setEditando(p.id);
     }
 
     async function remover(id) {
+
         if (!confirm("Excluir prazo?")) return;
+
         await deletarPrazo(id);
+
         carregar();
     }
 
+    const prazosOrdenados = [...prazos].sort(
+        (a, b) =>
+            new Date(a.dataLimite || 0) -
+            new Date(b.dataLimite || 0)
+    );
+
     return (
+
         <div className="space-y-8">
+
             <div>
                 <h1 className="text-2xl font-semibold text-gray-800">
                     Prazos
                 </h1>
+
                 <p className="text-sm text-gray-500 mt-1">
-                    Controle de obrigações, entregas e vencimentos
+                    Controle jurídico de obrigações e vencimentos
                 </p>
             </div>
 
             <Card>
+
                 <form
                     onSubmit={handleSubmit}
-                    className="grid md:grid-cols-5 gap-3"
+                    className="grid md:grid-cols-4 gap-3"
                 >
+
                     <div className="relative">
+
                         <input
                             placeholder="Cliente"
                             value={cliente}
-                            onChange={(e) => buscarCliente(e.target.value)}
+                            onChange={(e) =>
+                                buscarCliente(e.target.value)
+                            }
                             className="border rounded-lg px-3 py-2 w-full"
                         />
 
                         {sugestoes.length > 0 && (
-                            <div className="absolute bg-white border rounded-lg shadow w-full z-10">
+
+                            <div className="absolute bg-white border rounded-lg shadow w-full z-20">
+
                                 {sugestoes.map(c => (
+
                                     <div
                                         key={c.id}
                                         onClick={() => {
@@ -125,71 +199,235 @@ function Prazos() {
                                     >
                                         {c.nome}
                                     </div>
+
                                 ))}
+
                             </div>
+
                         )}
+
                     </div>
 
                     <input
                         placeholder="Descrição"
                         value={descricao}
-                        onChange={(e) => setDescricao(e.target.value)}
+                        onChange={(e) =>
+                            setDescricao(e.target.value)
+                        }
                         className="border rounded-lg px-3 py-2"
                     />
 
                     <input
                         type="date"
                         value={dataLimite}
-                        onChange={(e) => setDataLimite(e.target.value)}
+                        onChange={(e) =>
+                            setDataLimite(e.target.value)
+                        }
                         className="border rounded-lg px-3 py-2"
                     />
 
                     <select
                         value={prioridade}
-                        onChange={(e) => setPrioridade(e.target.value)}
+                        onChange={(e) =>
+                            setPrioridade(e.target.value)
+                        }
                         className="border rounded-lg px-3 py-2"
                     >
-                        <option value="">Prioridade</option>
-                        <option value="Baixa">Baixa</option>
-                        <option value="Média">Média</option>
-                        <option value="Alta">Alta</option>
+                        <option value="">
+                            Prioridade
+                        </option>
+
+                        <option value="Baixa">
+                            Baixa
+                        </option>
+
+                        <option value="Média">
+                            Média
+                        </option>
+
+                        <option value="Alta">
+                            Alta
+                        </option>
                     </select>
 
-                    <button className="bg-yellow-600 text-white rounded-lg px-4 py-2">
+                    <input
+                        placeholder="Tribunal"
+                        value={tribunal}
+                        onChange={(e) =>
+                            setTribunal(e.target.value)
+                        }
+                        className="border rounded-lg px-3 py-2"
+                    />
+
+                    <input
+                        placeholder="Número Processo"
+                        value={numeroProcesso}
+                        onChange={(e) =>
+                            setNumeroProcesso(e.target.value)
+                        }
+                        className="border rounded-lg px-3 py-2"
+                    />
+
+                    <input
+                        placeholder="Link Tribunal"
+                        value={linkTribunal}
+                        onChange={(e) =>
+                            setLinkTribunal(e.target.value)
+                        }
+                        className="border rounded-lg px-3 py-2"
+                    />
+
+                    <select
+                        value={status}
+                        onChange={(e) =>
+                            setStatus(e.target.value)
+                        }
+                        className="border rounded-lg px-3 py-2"
+                    >
+                        <option value="Pendente">
+                            Pendente
+                        </option>
+
+                        <option value="Concluído">
+                            Concluído
+                        </option>
+
+                        <option value="Atrasado">
+                            Atrasado
+                        </option>
+                    </select>
+
+                    <button
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg px-4 py-2"
+                    >
                         {editando ? "Salvar" : "Registrar"}
                     </button>
+
                 </form>
+
             </Card>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {prazos.map(p => (
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
+
+                {prazosOrdenados.map(p => (
+
                     <div
                         key={p.id}
-                        className="bg-white border rounded-xl p-5 shadow-sm"
+                        className="bg-white border rounded-2xl p-5 shadow-sm hover:shadow-md transition"
                     >
-                        <p className="font-semibold">{p.cliente}</p>
-                        <p>Descrição: {p.descricao}</p>
-                        <p>Prazo: {p.dataLimite}</p>
-                        <p>Prioridade: {p.prioridade}</p>
 
-                        <div className="flex gap-3 mt-4">
+                        <div className="flex items-start justify-between gap-4">
+
+                            <div>
+
+                                <h2 className="font-semibold text-lg text-gray-800">
+                                    {p.cliente}
+                                </h2>
+
+                                <p className="text-sm text-gray-500 mt-1">
+                                    {p.numeroProcesso}
+                                </p>
+
+                            </div>
+
+                            <span
+                                className={
+                                    p.prioridade === "Alta"
+                                        ? "text-red-600 font-semibold"
+                                        : p.prioridade === "Média"
+                                            ? "text-yellow-600 font-semibold"
+                                            : "text-green-600 font-semibold"
+                                }
+                            >
+                                {p.prioridade}
+                            </span>
+
+                        </div>
+
+                        <div className="mt-4 space-y-2 text-sm text-gray-700">
+
+                            <p>
+                                <span className="font-medium">
+                                    Tribunal:
+                                </span>{" "}
+                                {p.tribunal}
+                            </p>
+
+                            <p>
+                                <span className="font-medium">
+                                    Descrição:
+                                </span>{" "}
+                                {p.descricao}
+                            </p>
+
+                            <p>
+                                <span className="font-medium">
+                                    Prazo:
+                                </span>{" "}
+                                {p.dataLimite}
+                            </p>
+
+                            <p>
+                                <span className="font-medium">
+                                    Status:
+                                </span>{" "}
+
+                                <span
+                                    className={
+                                        p.status === "Atrasado"
+                                            ? "text-red-600 font-semibold"
+                                            : p.status === "Concluído"
+                                                ? "text-green-600 font-semibold"
+                                                : "text-yellow-600 font-semibold"
+                                    }
+                                >
+                                    {p.status}
+                                </span>
+                            </p>
+
+                        </div>
+
+                        {p.linkTribunal && (
+
+                            <a
+                                href={p.linkTribunal}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-block mt-4 text-blue-600 hover:underline text-sm"
+                            >
+                                Abrir no Tribunal
+                            </a>
+
+                        )}
+
+                        <div className="flex gap-4 mt-5">
+
                             <button
-                                onClick={() => iniciarEdicao(p)}
-                                className="text-blue-600"
+                                onClick={() =>
+                                    iniciarEdicao(p)
+                                }
+                                className="text-blue-600 hover:text-blue-800"
                             >
                                 Editar
                             </button>
 
                             <button
-                                onClick={() => remover(p.id)}
-                                className="text-red-600"
+                                onClick={() =>
+                                    remover(p.id)
+                                }
+                                className="text-red-600 hover:text-red-800"
                             >
                                 Excluir
                             </button>
+
                         </div>
+
                     </div>
+
                 ))}
+
             </div>
+
         </div>
     );
 }

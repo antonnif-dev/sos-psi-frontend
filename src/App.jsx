@@ -23,7 +23,7 @@ import RoleRoute from "./routes/RoleRoute";
 import AppDemo from "./demo/AppDemo";
 
 //saude
-import Anamnese from "./pages/saude/Anamnese";
+import Anamnese from "./pages/Anamnese";
 import Prontuario from "./pages/saude/Prontuario";
 
 //estetica
@@ -185,8 +185,8 @@ function App() {
                     path="/anamnese"
                     element={
                         <PrivateRoute>
-                            <SegmentRoute allowedSegments={["saude"]}>
-                                <ProfissaoRoute allowedProfissoes={["psicologo", "nutricionista"]}>
+                            <SegmentRoute allowedSegments={["saude", "profissionais"]}>
+                                <ProfissaoRoute allowedProfissoes={["psicologo", "nutricionista", "advogado"]}>
                                     <DashboardLayout>
                                         <Anamnese />
                                     </DashboardLayout>

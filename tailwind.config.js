@@ -16,7 +16,7 @@ export default {
                 muted: "#6B7280",
                 success: "#10B981",
                 danger: "#EF4444"
-            }
+            },
             animation: {
                 'spin-slow': 'spin 3s linear infinite',
                 'spin-reverse': 'spin 2.5s linear infinite reverse',

@@ -63,7 +63,7 @@ function LayoutPsicologia({ children }) {
                 </div>
 
                 {/* AÇÕES */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 md:gap-10">
                     {roleUsuario === "admin" && (
                         <Link
                             to="/configuracoes"

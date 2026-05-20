@@ -5,6 +5,8 @@ import Card from "../components/Card";
 import { db } from "../services/firebase";
 import { doc, getDoc, getDocs, collection } from "firebase/firestore";
 import { useAuth } from "../hooks/useAuth";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 
 function Agenda() {
     const [consultas, setConsultas] = useState([]);
@@ -21,6 +23,27 @@ function Agenda() {
     const [modalNovo, setModalNovo] = useState(null);
     const [buscaPaciente, setBuscaPaciente] = useState("");
     const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
+    const [dataSelecionada, setDataSelecionada] = useState(new Date());
+
+    const eventosDoDia = consultas.filter((consulta) => {
+
+        console.log("🧪 FILTRANDO:", consulta);
+
+        const dataConsulta = normalizarData(consulta.data);
+
+        console.log("📅 DATA CONSULTA:", dataConsulta);
+
+        console.log("📅 DATA SELECIONADA:", dataSelecionada);
+
+        const bate =
+            dataConsulta?.toDateString() ===
+            dataSelecionada.toDateString();
+
+        console.log("✅ PASSOU FILTRO?", bate);
+
+        return bate;
+
+    });
 
     const horarios = [
         "08:00", "09:00", "10:00", "11:00",
@@ -215,15 +238,33 @@ function Agenda() {
     function diasSemana() {
         const base = inicioSemana(new Date());
         base.setDate(base.getDate() + semanaOffset * 7);
+
         const dias = [];
+
+        const nomesDias = [
+            "domingo",
+            "segunda",
+            "terca",
+            "quarta",
+            "quinta",
+            "sexta",
+            "sabado"
+        ];
+
         for (let i = 0; i < 7; i++) {
+
             const d = new Date(base);
             d.setDate(base.getDate() + i);
-            const diaSemana = d.getDay();
-            if (diaSemana === 6 && !configAgenda.sabado) continue;
-            if (diaSemana === 0 && !configAgenda.domingo) continue;
+
+            const diaNome = nomesDias[d.getDay()];
+
+            const config = disponibilidade?.[diaNome];
+
+            if (!config?.ativo) continue;
+
             dias.push(d);
         }
+
         return dias;
     }
 
@@ -420,104 +461,171 @@ function Agenda() {
                 </div>
             </div>
 
-            <Card className="overflow-hidden">
-                <div className="overflow-x-auto">
-                    <div className="grid w-full border text-[10px] md:text-xs"
-                        style={{
-                            gridTemplateColumns: `${window.innerWidth < 768 ? "48px" : "80px"}
-                                                    repeat(${dias.length}, minmax(0,1fr))`
+            {/*novo calendario*/}
+            <div className="grid lg:grid-cols-[750px_1fr] gap-6">
+
+                {/* CALENDÁRIO */}
+                <Card className="p-4">
+
+                    <Calendar
+                        onChange={setDataSelecionada}
+                        value={dataSelecionada}
+                        locale="pt-BR"
+
+                        tileContent={({ date }) => {
+
+                            const possuiEvento = consultas.some((consulta) => {
+
+                                const dataConsulta = new Date(consulta.data);
+
+                                return (
+                                    dataConsulta.toDateString() ===
+                                    date.toDateString()
+                                );
+
+                            });
+
+                            return possuiEvento ? (
+                                <div className="flex justify-center mt-1">
+                                    <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+                                </div>
+                            ) : null;
+
                         }}
-                    >
-                        <div></div>
+                    />
 
-                        {dias.map((d, i) => (
-                            <div key={i} className="border p-2 text-center">
-                                <div className="font-medium text-[10px] md:text-base">
-                                    {d.toLocaleDateString("pt-BR", { weekday: "short" })}
-                                </div>
-                                <div className="text-[7px] md:text-xs text-gray-500">
-                                    {d.toLocaleDateString()}
-                                </div>
-                            </div>
-                        ))}
-                        {horarios.map(h => (
-                            <div key={h} className="contents">
-                                <div className="border p-2 text-xs text-gray-500">
-                                    {h}
-                                </div>
-                                {dias.map((dia, i) => {
-                                    const consultasSlot = consultasNoSlot(dia, h) || [];
-                                    const disponivel = horarioDisponivel(dia, h);
-                                    return (
-                                        <div
-                                            key={dia.toISOString() + h}
-                                            className={`
-    border
-    h-12 
-    p-[1px] md:p-1
-    p-1
-    text-xs
-    flex
-    flex-col
-    gap-[2px]
-    overflow-hidden
-    ${!disponivel
-                                                    ? "bg-gray-200 cursor-not-allowed"
-                                                    : "hover:bg-indigo-50 cursor-pointer"
-                                                }
-`}
-                                            onClick={() => {
-                                                if (!disponivel) return;
+                </Card>
 
-                                                if (consultasSlot.length === 0) {
-                                                    abrirNovo(dia, h);
-                                                }
-                                            }}
-                                        >
-                                            {consultasSlot.map(consulta => (
-                                                <div
-                                                    onClick={(e) => {
+                {/* EVENTOS DO DIA */}
+                <Card className="p-4 space-y-4">
 
-                                                        e.stopPropagation();
+                    <div className="flex items-center justify-between">
 
-                                                        setModalConsulta(consulta);
+                        <h2 className="text-lg font-semibold">
+                            Eventos do dia
+                        </h2>
 
-                                                    }}
+                        <button
+                            onClick={() => abrirNovo(dataSelecionada, "08:00")}
+                            className="px-3 py-2 bg-indigo-600 text-white rounded-lg"
+                        >
+                            Nova consulta                            
+                        </button>
 
-                                                    className={`
-    ${coresStatus[consulta.status] || "bg-indigo-100"}
-    rounded
-    px-1
-    py-[2px]
-    border-l-4
-    flex-1
-    overflow-hidden
-    min-h-0
-    min-w-0
-`}
-                                                    style={{
-                                                        borderLeftColor: consulta.corAgenda || "#6366f1"
-                                                    }}
-                                                >
-                                                    <div className="font-medium truncate leading-none text-[8px] md:text-[10px]">
-                                                        {nomePaciente(consulta.pacienteId)}
-                                                    </div>
-
-                                                    {consulta.psicologoNome && (
-                                                        <div className="text-[7px] md:text-[8px] text-gray-600 truncate leading-none">
-                                                            {consulta.psicologoNome}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        ))}
                     </div>
-                </div>
-            </Card>
+
+                    <div className="space-y-3">
+
+                        {eventosDoDia.length === 0 ? (
+
+                            <div className="text-sm text-gray-500">
+                                Nenhuma consulta neste dia.
+                            </div>
+
+                        ) : (
+
+                            eventosDoDia.map((consulta) => {
+
+                                console.log("🎨 RENDERIZANDO EVENTO:", {
+                                    id: consulta.id,
+                                    tipo: consulta.tipo,
+                                    pacienteNome: consulta.pacienteNome,
+                                    data: consulta.data,
+                                    status: consulta.status
+                                });
+
+                                return (
+
+                                    <div
+                                        key={consulta.id}
+                                        onClick={() => setModalConsulta(consulta)}
+                                        className="
+                            border
+                            rounded-xl
+                            p-4
+                            cursor-pointer
+                            hover:bg-gray-50
+                            transition
+                        "
+                                    >
+
+                                        <div className="flex items-center justify-between">
+
+                                            <div>
+                                                <div className="font-medium">
+                                                    {
+                                                        consulta.pacienteNome
+                                                        ||
+                                                        nomePaciente(consulta.pacienteId)
+                                                    }
+                                                </div>
+                                                {/* Versão antiga 
+                                            <div className="font-medium">
+                                                {
+                                                    consulta.pacienteNome
+                                                    ||
+                                                    nomePaciente(consulta.pacienteId)
+                                                }
+                                            </div>
+                                            */}
+
+                                                {consulta.tipo && (
+                                                    <div className="text-sm text-gray-500">
+                                                        {consulta.tipo}
+                                                    </div>
+                                                )}
+                                                {/* Lógica antiga
+                                            {consulta.psicologoNome && (
+                                                <div className="text-sm text-gray-500">
+                                                    {consulta.psicologoNome}
+                                                </div>
+                                            )}
+                                             */}
+
+                                            </div>
+
+                                            <div
+                                                className={`
+                                                        text-sm
+                                                        font-medium
+                                                        ${consulta.tipo === "prazo"
+                                                        ? "text-orange-600"
+                                                        : "text-indigo-600"
+                                                    }
+                                                    `}
+                                            >
+
+                                                {
+                                                    consulta.tipo === "prazo"
+                                                        ? "Prazo"
+                                                        : normalizarData(consulta.data)
+                                                            ?.toLocaleTimeString(
+                                                                "pt-BR",
+                                                                {
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit"
+                                                                }
+                                                            )
+                                                }
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                );
+
+                            })
+
+                        )}
+
+                    </div>
+
+                </Card>
+
+            </div>
+
             {/*modal criar agenda*/}
             {modalNovo && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">

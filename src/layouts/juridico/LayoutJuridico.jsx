@@ -40,14 +40,14 @@ function LayoutJuridico({ children }) {
     };
 
     return (
-        <div className="flex h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-slate-100 relative overflow-hidden">
+        <div className="flex h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 relative overflow-hidden">
 
             {/* SIDEBAR */}
             <aside
                 className={`
                     bg-slate-950/95 backdrop-blur-md border-r border-amber-500/10
                     transition-all duration-300 overflow-hidden shadow-2xl
-                    ${menuAberto ? "w-48 md:w-72 p-6" : "w-0 p-0"}
+                    ${menuAberto ? "w-48 md:w-72 p-6" : "w-0 p-0"} text-slate-100
                 `}
             >
                 {/* MARCA */}
@@ -75,7 +75,7 @@ function LayoutJuridico({ children }) {
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className="flex flex-col md:flex-row gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition font-medium"
+                                className="flex flex-col md:flex-row gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition font-medium md:text-xl"
                             >
                                 {Icon && (
                                     <Icon className="w-5 h-5 md:w-6 md:h-6" />
@@ -88,7 +88,7 @@ function LayoutJuridico({ children }) {
                     {/* PERFIL */}
                     <Link
                         to="/meu-perfil"
-                        className="px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition flex items-center gap-3"
+                        className="px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition flex items-center gap-3 md:text-xl"
                     >
                         <UserPen size={18} />
                         Perfil
@@ -129,7 +129,7 @@ function LayoutJuridico({ children }) {
 
                     {/* SAUDAÇÃO */}
                     <div className="hidden md:block text-center">
-                        <p className="font-medium text-slate-700">
+                        <p className="font-medium text-black">
                             {getSaudacao()}, {tenant.usuario?.nome}
                         </p>
                         <p className="text-sm text-slate-500">
@@ -143,7 +143,7 @@ function LayoutJuridico({ children }) {
                         {roleUsuario === "admin" && (
                             <Link
                                 to="/configuracoes"
-                                className="px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition flex items-center gap-3"
+                                className="px-4 py-3 rounded-xl text-slate-600 hover:bg-cyan-500/10 hover:text-cyan-700 transition flex items-center gap-3"
                             >
                                 <Settings size={18} />
                                 Configurações

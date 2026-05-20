@@ -24,8 +24,8 @@ export default function Configuracoes() {
     });
 
     const [agenda, setAgenda] = useState({
-        sabado: false,
-        domingo: false
+        sabado: true,
+        domingo: true
     });
 
     const [disponibilidade, setDisponibilidade] = useState({
@@ -72,12 +72,23 @@ export default function Configuracoes() {
                     });
 
                     setAgenda({
-                        sabado: data.agenda?.sabado || false,
-                        domingo: data.agenda?.domingo || false
+                        sabado: data.agenda?.sabado ?? true,
+                        domingo: data.agenda?.domingo ?? true
                     });
 
                     if (data.disponibilidade) {
-                        setDisponibilidade(data.disponibilidade);
+                        setDisponibilidade((prev) => {
+                            const nova = { ...prev };
+
+                            for (const dia in data.disponibilidade) {
+                                nova[dia] = {
+                                    ...prev[dia],
+                                    ...data.disponibilidade[dia]
+                                };
+                            }
+
+                            return nova;
+                        });
                     }
 
                     break;
@@ -188,7 +199,11 @@ export default function Configuracoes() {
 
                     {dias.map(dia => {
 
-                        const dados = disponibilidade[dia];
+                        const dados = disponibilidade[dia] || {
+                            ativo: false,
+                            inicio: "08:00",
+                            fim: "18:00"
+                        };
 
                         return (
 

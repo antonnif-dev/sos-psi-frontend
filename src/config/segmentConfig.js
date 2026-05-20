@@ -41,6 +41,8 @@ export const segmentConfig = {
             notificacoes: "Notificações",
             observacoes: "Anamneses",
             observacao: "Anamnese",
+            anamnese: "Anamnese",
+            anamneses: "Anamneses",
         },
 
         menu: [
@@ -59,7 +61,7 @@ export const segmentConfig = {
                 path: "/anamnese",
                 icon: Activity,
                 roles: ["admin", "psicologo"],
-                profissoes: ["psicologo"]
+                profissoes: ["psicologo", "advogado"]
             },
             { label: "Documentos", path: "/documentos", icon: FileMinus },
             { label: "Mapa da Evolucao", path: "/mapa-evolucao", icon: RefreshCcw },
@@ -80,7 +82,7 @@ export const segmentConfig = {
     profissionais: {
         theme: {
             sidebar: "bg-gray-900",
-            topbar: "bg-gray-800 text-white",
+            topbar: "bg-gray-800",
             background: "bg-gray-100",
             primaryText: "text-black"
         },
@@ -98,6 +100,8 @@ export const segmentConfig = {
             notificacoes: "Notificações",
             observacoes: "Observações",
             observacao: "Observação",
+            anamnese: "Observação",
+            anamneses: "Observações",
         },
 
         menu: [
@@ -110,6 +114,7 @@ export const segmentConfig = {
             { label: "Prazos", path: "/prazos", icon: AlarmClock },
             { label: "Processos", path: "/processos", icon: ShieldPlus },
             { label: "Relatórios", path: "/relatorios", icon: NotebookPen },
+            { label: "Relatórios", path: "/anamnese", icon: Activity },
         ]
     },
 
