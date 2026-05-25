@@ -34,13 +34,10 @@ function Prazos() {
     }
 
     useEffect(() => {
-
         carregar();
 
         async function carregarClientes() {
-
             const dados = await listarClientes();
-
             setClientes(dados);
         }
 
@@ -49,7 +46,6 @@ function Prazos() {
     }, []);
 
     function buscarCliente(texto) {
-
         setCliente(texto);
 
         if (!texto) {
@@ -65,7 +61,6 @@ function Prazos() {
     }
 
     async function handleSubmit(e) {
-
         e.preventDefault();
 
         const data = {
@@ -77,7 +72,15 @@ function Prazos() {
             numeroProcesso,
             linkTribunal,
             status,
-            psicologoId: user?.uid || null
+            psicologoId: user?.uid || null,
+            psicologoNome:
+                user?.name
+                ||
+                user?.displayName
+                ||
+                "Profissional",
+
+            tipo: "prazo"
         };
 
         if (editando) {
@@ -90,28 +93,18 @@ function Prazos() {
         }
 
         limparFormulario();
-
         carregar();
     }
 
     function limparFormulario() {
-
         setCliente("");
-
         setDescricao("");
-
         setDataLimite("");
-
         setPrioridade("");
-
         setTribunal("");
-
         setNumeroProcesso("");
-
         setLinkTribunal("");
-
         setStatus("Pendente");
-
         setEditando(null);
     }
 

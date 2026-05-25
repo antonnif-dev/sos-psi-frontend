@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { listarPacientes } from "../services/pacientesService";
 import { listarConsultas, criarConsulta, deletarConsulta, editarConsulta } from "../services/agendaService";
 import Card from "../components/Card";
@@ -45,6 +45,53 @@ function Agenda() {
 
     });
 
+    const diasSemana = useCallback(() => {
+
+        console.log("🧪 DISPONIBILIDADE:", disponibilidade);
+
+        const base = inicioSemana(new Date());
+
+        base.setDate(
+            base.getDate() + semanaOffset * 7
+        );
+
+        const dias = [];
+
+        const nomesDias = [
+            "domingo",
+            "segunda",
+            "terca",
+            "quarta",
+            "quinta",
+            "sexta",
+            "sabado"
+        ];
+
+        for (let i = 0; i < 7; i++) {
+
+            const d = new Date(base);
+
+            d.setDate(base.getDate() + i);
+
+            const diaNome =
+                nomesDias[d.getDay()];
+
+            const config =
+                disponibilidade?.[diaNome];
+
+            const ativo =
+                config?.ativo ?? true;
+
+            if (!ativo) continue;
+
+            dias.push(d);
+
+        }
+
+        return dias;
+
+    }, [disponibilidade, semanaOffset]);
+
     const horarios = [
         "08:00", "09:00", "10:00", "11:00",
         "12:00", "13:00", "14:00", "15:00",
@@ -60,13 +107,11 @@ function Agenda() {
     const [diaMobileIndex, setDiaMobileIndex] = useState(0);
 
     async function carregar() {
+        const dias = diasSemana();
 
         if (!dias.length) {
-
             console.warn("⚠️ Nenhum dia encontrado na agenda");
-
             return;
-
         }
 
         const inicio = new Date(dias[0]);
@@ -140,6 +185,11 @@ function Agenda() {
 
             const pacientesLista =
                 await listarPacientes();
+            console.log("🧪 PACIENTES RAW:", pacientesLista);
+            console.log(
+                "🧪 PRIMEIRO PACIENTE:",
+                pacientesLista[0]
+            );
 
             console.log(
                 "✅ Pacientes carregados:",
@@ -179,15 +229,23 @@ function Agenda() {
 
     useEffect(() => {
         if (!user) return;
-        carregar();
 
-        async function carregarConfiguracoes() {
+        async function inicializarAgenda() {
+
             try {
+
+                console.log("🚀 Inicializando agenda");
+
                 const tenantsSnapshot = await getDocs(
                     collection(db, "tenants")
                 );
 
+                let tenantEncontrado = null;
+                let disponibilidadeEncontrada = {};
+                let agendaEncontrada = {};
+
                 for (const tenantDoc of tenantsSnapshot.docs) {
+
                     const userRef = doc(
                         db,
                         "tenants",
@@ -199,33 +257,60 @@ function Agenda() {
                     const userSnap = await getDoc(userRef);
 
                     if (userSnap.exists()) {
-                        setTenantId(tenantDoc.id);
+
+                        tenantEncontrado = tenantDoc.id;
+
                         const data = tenantDoc.data();
 
-                        if (data.disponibilidade) {
-                            setDisponibilidade(
-                                data.disponibilidade
-                            );
-                        }
+                        disponibilidadeEncontrada =
+                            data.disponibilidade || {};
 
-                        if (data.agenda) {
-                            setConfigAgenda(
-                                data.agenda
-                            );
-                        }
+                        agendaEncontrada =
+                            data.agenda || {};
 
                         break;
+
                     }
+
                 }
 
+                console.log("🏢 Tenant encontrado:", tenantEncontrado);
+
+                console.log(
+                    "📅 Disponibilidade:",
+                    disponibilidadeEncontrada
+                );
+
+                setTenantId(tenantEncontrado);
+
+                setDisponibilidade(
+                    disponibilidadeEncontrada
+                );
+
+                setConfigAgenda(
+                    agendaEncontrada
+                );
+
+                console.log("✅ Configurações carregadas");
+
+                // SOMENTE AGORA carrega agenda
+                await carregar();
+
+                console.log("✅ Agenda carregada");
+
             } catch (error) {
+
                 console.error(
-                    "❌ Erro ao carregar configurações:",
+                    "❌ Erro ao inicializar agenda:",
                     error
                 );
+
             }
+
         }
-        carregarConfiguracoes();
+
+        inicializarAgenda();
+
     }, [user, semanaOffset]);
 
     function inicioSemana(data) {
@@ -234,41 +319,45 @@ function Agenda() {
         const diff = d.getDate() - dia + (dia === 0 ? -6 : 1);
         return new Date(d.setDate(diff));
     }
-
-    function diasSemana() {
-        const base = inicioSemana(new Date());
-        base.setDate(base.getDate() + semanaOffset * 7);
-
-        const dias = [];
-
-        const nomesDias = [
-            "domingo",
-            "segunda",
-            "terca",
-            "quarta",
-            "quinta",
-            "sexta",
-            "sabado"
-        ];
-
-        for (let i = 0; i < 7; i++) {
-
-            const d = new Date(base);
-            d.setDate(base.getDate() + i);
-
-            const diaNome = nomesDias[d.getDay()];
-
-            const config = disponibilidade?.[diaNome];
-
-            if (!config?.ativo) continue;
-
-            dias.push(d);
+    /*
+        function diasSemana() {
+            console.log("🧪 DISPONIBILIDADE:", disponibilidade);
+    
+            const base = inicioSemana(new Date());
+            base.setDate(base.getDate() + semanaOffset * 7);
+    
+            const dias = [];
+    
+            const nomesDias = [
+                "domingo",
+                "segunda",
+                "terca",
+                "quarta",
+                "quinta",
+                "sexta",
+                "sabado"
+            ];
+    
+            for (let i = 0; i < 7; i++) {
+    
+                const d = new Date(base);
+                d.setDate(base.getDate() + i);
+    
+                const diaNome = nomesDias[d.getDay()];
+    
+                const config = disponibilidade?.[diaNome];
+    
+                const ativo =
+                    config?.ativo ?? true;
+    
+                if (!ativo) continue;
+    
+                dias.push(d);
+            }
+    
+            return dias;
         }
-
-        return dias;
-    }
-
-    const dias = diasSemana();
+    */
 
     function periodoSemana() {
         const inicio = inicioSemana(new Date());
@@ -295,6 +384,10 @@ function Agenda() {
         ];
         const diaNome = dias[data.getDay()];
         const config = disponibilidade[diaNome];
+        console.log("🧪 CONFIG DIA:", {
+            diaNome,
+            config
+        });
         if (!config || !config.ativo) return false;
         const inicio = config.inicio;
         const fim = config.fim;
@@ -390,7 +483,10 @@ function Agenda() {
             pacienteId: pacienteSelecionado.id,
             pacienteNome: pacienteSelecionado.nome,
             data: data.toISOString(),
-            status: "agendada"
+            status: "agendada",
+            psicologoId: user.uid,
+            psicologoNome: user.name || user.displayName
+
         });
         setModalNovo(null);
         setPacienteSelecionado(null);
@@ -509,7 +605,7 @@ function Agenda() {
                             onClick={() => abrirNovo(dataSelecionada, "08:00")}
                             className="px-3 py-2 bg-indigo-600 text-white rounded-lg"
                         >
-                            Nova consulta                            
+                            Nova consulta
                         </button>
 
                     </div>
@@ -525,6 +621,8 @@ function Agenda() {
                         ) : (
 
                             eventosDoDia.map((consulta) => {
+                                const tipo =
+                                    consulta.tipo || "consulta";
 
                                 console.log("🎨 RENDERIZANDO EVENTO:", {
                                     id: consulta.id,
@@ -559,28 +657,12 @@ function Agenda() {
                                                         nomePaciente(consulta.pacienteId)
                                                     }
                                                 </div>
-                                                {/* Versão antiga 
-                                            <div className="font-medium">
-                                                {
-                                                    consulta.pacienteNome
-                                                    ||
-                                                    nomePaciente(consulta.pacienteId)
-                                                }
-                                            </div>
-                                            */}
 
-                                                {consulta.tipo && (
+                                                {tipo && (
                                                     <div className="text-sm text-gray-500">
-                                                        {consulta.tipo}
+                                                        {tipo}
                                                     </div>
                                                 )}
-                                                {/* Lógica antiga
-                                            {consulta.psicologoNome && (
-                                                <div className="text-sm text-gray-500">
-                                                    {consulta.psicologoNome}
-                                                </div>
-                                            )}
-                                             */}
 
                                             </div>
 
@@ -588,7 +670,7 @@ function Agenda() {
                                                 className={`
                                                         text-sm
                                                         font-medium
-                                                        ${consulta.tipo === "prazo"
+                                                        ${tipo === "prazo"
                                                         ? "text-orange-600"
                                                         : "text-indigo-600"
                                                     }
@@ -596,7 +678,7 @@ function Agenda() {
                                             >
 
                                                 {
-                                                    consulta.tipo === "prazo"
+                                                    tipo === "prazo"
                                                         ? "Prazo"
                                                         : normalizarData(consulta.data)
                                                             ?.toLocaleTimeString(
@@ -636,6 +718,34 @@ function Agenda() {
                         <div className="text-sm text-gray-500">
                             {modalNovo.data.toLocaleDateString()} às {modalNovo.horario}
                         </div>
+                        <select
+                            value={modalNovo.horario}
+                            onChange={(e) =>
+                                setModalNovo({
+                                    ...modalNovo,
+                                    horario: e.target.value
+                                })
+                            }
+                            className="
+                                w-full
+                                border
+                                p-2
+                                rounded
+                            "
+                        >
+
+                            {horarios.map((horario) => (
+
+                                <option
+                                    key={horario}
+                                    value={horario}
+                                >
+                                    {horario}
+                                </option>
+
+                            ))}
+
+                        </select>
                         <input
                             type="text"
                             placeholder="Buscar paciente..."
@@ -839,7 +949,7 @@ function Agenda() {
                 </div>
             )}
         </div>
-    )
+    );
 }
 
 export default Agenda
