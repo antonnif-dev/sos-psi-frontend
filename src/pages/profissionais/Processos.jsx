@@ -5,7 +5,9 @@ import {
     listarProcessos,
     criarProcesso,
     editarProcesso,
-    deletarProcesso
+    deletarProcesso,
+    sincronizarProcesso,
+    listarMovimentacoes
 } from "../../services/profissionais/processosService";
 
 function Processos() {
@@ -18,6 +20,8 @@ function Processos() {
     const [titulo, setTitulo] = useState("");
     const [tipo, setTipo] = useState("");
     const [status, setStatus] = useState("");
+    const [numeroProcesso, setNumeroProcesso] = useState("");
+    const [tribunal, setTribunal] = useState("tjmg");
 
     const [editando, setEditando] = useState(null);
     const [sugestoes, setSugestoes] = useState([]);
@@ -25,9 +29,10 @@ function Processos() {
     // 🔥 MODAL STATE
     const [modalOpen, setModalOpen] = useState(false);
     const [processoSelecionado, setProcessoSelecionado] = useState(null);
+    const [movimentacoes, setMovimentacoes] = useState([]);
 
     const [editModal, setEditModal] = useState(false);
-    
+
     const [formModal, setFormModal] = useState({
         clientId: "",
         clienteNome: "",
@@ -35,20 +40,6 @@ function Processos() {
         tipo: "",
         status: ""
     });
-
-    function abrirModal(p) {
-        setProcessoSelecionado(p);
-
-        setFormModal({
-            clientId: p.clientId || "",
-            clienteNome: p.cliente || "",
-            titulo: p.titulo || "",
-            tipo: p.tipo || "",
-            status: p.status || ""
-        });
-
-        setModalOpen(true);
-    }
 
     async function salvarEdicaoModal() {
         await editarProcesso(processoSelecionado.id, {
@@ -112,7 +103,9 @@ function Processos() {
             clientId,
             titulo,
             tipo,
-            status
+            status,
+            numeroProcesso,
+            tribunal
         };
 
         if (editando) {
@@ -126,9 +119,55 @@ function Processos() {
         setTitulo("");
         setTipo("");
         setStatus("");
+        setNumeroProcesso("");
+        setTribunal("tjmg");
         setEditando(null);
 
         carregar();
+    }
+
+    async function sincronizar(id) {
+
+        try {
+
+            const resultado =
+                await sincronizarProcesso(id);
+
+            await carregarMovimentacoes(id);
+
+            alert(
+                `${resultado.total} movimentações importadas`
+            );
+
+        } catch (error) {
+
+            alert(
+                "Erro ao sincronizar"
+            );
+
+        }
+
+    }
+
+    async function carregarMovimentacoes(
+        processoId
+    ) {
+
+        try {
+
+            const dados =
+                await listarMovimentacoes(
+                    processoId
+                );
+
+            setMovimentacoes(dados);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
     }
 
     function iniciarEdicao(p) {
@@ -148,10 +187,27 @@ function Processos() {
         carregar();
     }
 
-    // 🔥 abrir modal
-    function abrirModal(p) {
+    async function abrirModal(p) {
+        console.log(
+            "PROCESSO MODAL:",
+            p
+        );
         setProcessoSelecionado(p);
+
+        setFormModal({
+            clientId: p.clientId || "",
+            clienteNome: p.cliente || "",
+            titulo: p.titulo || "",
+            tipo: p.tipo || "",
+            status: p.status || ""
+        });
+
+        await carregarMovimentacoes(
+            p.id
+        );
+
         setModalOpen(true);
+
     }
 
     function fecharModal() {
@@ -170,6 +226,7 @@ function Processos() {
                 <p className="text-sm text-gray-500 mt-1">
                     Gestão de processos jurídicos
                 </p>
+
             </div>
 
             {/* CARD STATS */}
@@ -232,6 +289,27 @@ function Processos() {
                         className="border rounded-lg px-3 py-2"
                     />
 
+                    <input
+                        placeholder="Número do Processo"
+                        value={numeroProcesso}
+                        onChange={(e) =>
+                            setNumeroProcesso(e.target.value)
+                        }
+                        className="border rounded-lg px-3 py-2"
+                    />
+
+                    <select
+                        value={tribunal}
+                        onChange={(e) =>
+                            setTribunal(e.target.value)
+                        }
+                        className="border rounded-lg px-3 py-2"
+                    >
+                        <option value="tjmg">TJMG</option>
+                        <option value="tjsp">TJSP</option>
+                        <option value="tjrj">TJRJ</option>
+                    </select>
+
                     <button className="bg-blue-700 text-white rounded-lg px-4 py-2">
                         {editando ? "Salvar" : "Registrar"}
                     </button>
@@ -253,6 +331,8 @@ function Processos() {
                         <p>Título: {p.titulo}</p>
                         <p>Tipo: {p.tipo}</p>
                         <p>Status: {p.status}</p>
+                        <p>Número: {p.numeroProcesso}</p>
+                        <p>Tribunal: {p.tribunal}</p>
 
                         <div
                             className="flex gap-3 mt-4"
@@ -263,6 +343,13 @@ function Processos() {
                                 className="text-blue-600"
                             >
                                 Editar
+                            </button>
+
+                            <button
+                                onClick={() => sincronizar(p.id)}
+                                className="text-green-600"
+                            >
+                                Sincronizar
                             </button>
 
                             <button
@@ -277,9 +364,8 @@ function Processos() {
             </div>
 
             {/* MODAL */}
-            {/* MODAL */}
             {modalOpen && processoSelecionado && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-5">
 
                     <div className="bg-white w-full max-w-2xl rounded-xl p-6 shadow-lg relative">
 
@@ -323,6 +409,37 @@ function Processos() {
                                 />
                             </div>
 
+                            <div className="mb-4 bg-gray-50 p-3 rounded">
+
+                                <p>
+                                    <strong>Número:</strong>
+                                    {" "}
+                                    {processoSelecionado.numeroProcesso}
+                                </p>
+
+                                <p>
+                                    <strong>Tribunal:</strong>
+                                    {" "}
+                                    {processoSelecionado.tribunal}
+                                </p>
+
+                                <p>
+                                    <strong>Última sincronização:</strong>
+                                    {" "}
+                                    {
+                                        processoSelecionado
+                                            ?.ultimaSincronizacao?._seconds
+                                            ? new Date(
+                                                processoSelecionado
+                                                    .ultimaSincronizacao
+                                                    ._seconds * 1000
+                                            ).toLocaleString()
+                                            : "Nunca"
+                                    }
+                                </p>
+
+                            </div>
+
                             {/* TIPO */}
                             <div>
                                 <label className="text-xs text-gray-500">Tipo</label>
@@ -364,6 +481,47 @@ function Processos() {
                             </div>
                         </div>
 
+                        <hr className="my-6" />
+
+                        <h3 className="font-semibold text-lg mb-3">
+                            Movimentações
+                        </h3>
+
+                        <div className="max-h-64 overflow-y-auto border rounded-lg">
+
+                            {movimentacoes.length === 0 ? (
+
+                                <div className="p-4 text-gray-500">
+                                    Nenhuma movimentação encontrada
+                                </div>
+
+                            ) : (
+
+                                movimentacoes.map((mov) => (
+
+                                    <div
+                                        key={mov.id}
+                                        className="border-b p-3"
+                                    >
+
+                                        <p className="font-medium">
+                                            {mov.descricao}
+                                        </p>
+
+                                        <p className="text-xs text-gray-500">
+                                            {new Date(
+                                                mov.dataMovimentacao
+                                            ).toLocaleString()}
+                                        </p>
+
+                                    </div>
+
+                                ))
+
+                            )}
+
+                        </div>
+
                         {/* AÇÕES */}
                         <div className="flex gap-3 mt-6">
 
@@ -396,6 +554,8 @@ function Processos() {
 
                     </div>
                 </div>
+
+
             )}
         </div>
     );

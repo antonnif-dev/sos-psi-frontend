@@ -55,3 +55,24 @@ export async function deletarProcesso(id) {
         throw err;
     }
 }
+
+export async function sincronizarProcesso(id) {
+
+    const response = await api.post(
+        `/processos/${id}/sincronizar`
+    );
+
+    return response.data;
+}
+
+export async function listarMovimentacoes(
+    processoId
+) {
+
+    const response =
+        await api.get(
+            `/movimentacoes/${processoId}`
+        );
+
+    return response.data;
+}

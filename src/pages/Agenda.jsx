@@ -26,6 +26,14 @@ function Agenda() {
     const [dataSelecionada, setDataSelecionada] = useState(new Date());
 
     const eventosDoDia = consultas.filter((consulta) => {
+        console.log(
+            "TIPO EVENTO:",
+            consulta.tipo
+        );
+        console.log(
+            "DATA RAW:",
+            consulta.data
+        );
 
         console.log("🧪 FILTRANDO:", consulta);
 
@@ -143,7 +151,10 @@ function Agenda() {
                 startDate: inicio.toISOString(),
                 endDate: fim.toISOString()
             });
-
+            console.log(
+                "EVENTOS RECEBIDOS DA API:",
+                dados
+            );
             console.log(
                 "✅ Consultas carregadas:",
                 dados.length
@@ -177,6 +188,18 @@ function Agenda() {
                     status: c.status
                 });
 
+            });
+
+            console.log(
+                "📦 CONSULTAS RECEBIDAS COMPLETAS:",
+                JSON.stringify(dados, null, 2)
+            );
+            dados.forEach(item => {
+                console.log("🧪 ITEM", {
+                    id: item.id,
+                    tipo: item.tipo,
+                    data: item.data
+                });
             });
 
             setConsultas(dados);
@@ -221,6 +244,12 @@ function Agenda() {
         // se for timestamp do firestore
         if (data.seconds) {
             return new Date(data.seconds * 1000);
+        }
+
+        if (data._seconds) {
+            return new Date(
+                data._seconds * 1000
+            );
         }
 
         // fallback
@@ -572,7 +601,21 @@ function Agenda() {
 
                             const possuiEvento = consultas.some((consulta) => {
 
-                                const dataConsulta = new Date(consulta.data);
+                                const dataConsulta =
+                                    normalizarData(
+                                        consulta.data
+                                    );
+
+                                if (!dataConsulta) {
+
+                                    console.log(
+                                        "❌ EVENTO SEM DATA",
+                                        consulta
+                                    );
+
+                                    return false;
+
+                                }
 
                                 return (
                                     dataConsulta.toDateString() ===

@@ -47,7 +47,7 @@ function LayoutJuridico({ children }) {
                 className={`
                     bg-slate-950/95 backdrop-blur-md border-r border-amber-500/10
                     transition-all duration-300 overflow-hidden shadow-2xl
-                    ${menuAberto ? "w-48 md:w-72 p-6" : "w-0 p-0"} text-slate-100
+                    ${menuAberto ? "w-40 md:w-72 p-6" : "w-0 p-0"} text-slate-100
                 `}
             >
                 {/* MARCA */}
@@ -90,7 +90,7 @@ function LayoutJuridico({ children }) {
                         to="/meu-perfil"
                         className="px-4 py-3 rounded-xl text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition flex items-center gap-3 md:text-xl"
                     >
-                        <UserPen size={18} />
+                        <UserPen size={16} />
                         Perfil
                     </Link>
                 </nav>
@@ -99,15 +99,15 @@ function LayoutJuridico({ children }) {
             {/* BOTÃO MENU */}
             <button
                 onClick={() => setMenuAberto(!menuAberto)}
-                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/5 lg:-translate-x-1/5 bg-slate-950 text-amber-300 p-2 rounded-r-xl shadow-lg border border-slate-700 transition-all z-50"
+                className="absolute top-1/2 -translate-y-1/2 -translate-x-0/5 lg:-translate-x-0/5 bg-slate-950 text-amber-300 p-2 rounded-r-xl shadow-lg border border-slate-700 transition-all z-50"
                 style={{
                     left: menuAberto ? "clamp(10rem, 22vw, 18rem)" : "0px"
                 }}
             >
                 {menuAberto ? (
-                    <PanelLeftClose size={18} />
+                    <PanelLeftClose size={14} />
                 ) : (
-                    <PanelLeftOpen size={18} />
+                    <PanelLeftOpen size={14} />
                 )}
             </button>
 

@@ -96,7 +96,7 @@ function LayoutPsicologia({ children }) {
             <nav className="fixed bottom-0 left-0 right-0 z-50 px-3 py-1 flex justify-center">
                 <div className="bg-emerald-400 backdrop-blur-xl border border-cyan-100 rounded-3xl shadow-2xl px-3 py-4">
 
-                    <div className="flex justify-center md:justify-around items-center flex-wrap md:flex-nowrap rounded-2xl gap-3 lg:gap-15">
+                    <div className="flex justify-center md:justify-around items-center flex-wrap rounded-2xl gap-3 xl:gap-16">
 
                         {menu.map((item) => {
                             if (item.roles && !item.roles.includes(roleUsuario)) {

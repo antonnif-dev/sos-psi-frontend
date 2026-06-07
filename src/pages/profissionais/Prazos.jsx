@@ -10,6 +10,8 @@ import {
     editarPrazo,
     deletarPrazo
 } from "../../services/profissionais/prazosService";
+import Calendar from "react-calendar";
+import { listarTodasMovimentacoes } from "../../services/profissionais/movimentacoesService";
 
 function Prazos() {
     const [prazos, setPrazos] = useState([]);
@@ -25,6 +27,23 @@ function Prazos() {
     const [editando, setEditando] = useState(null);
     const [sugestoes, setSugestoes] = useState([]);
     const { user } = useAuth();
+    const [movimentacoes, setMovimentacoes] = useState([]);
+    const [dataSelecionada, setDataSelecionada] = useState(new Date());
+
+    const movimentacoesDoDia =
+        movimentacoes.filter(mov => {
+
+            const dataMov =
+                new Date(
+                    mov.dataMovimentacao
+                );
+
+            return (
+                dataMov.toDateString() ===
+                dataSelecionada.toDateString()
+            );
+
+        });
 
     async function carregar() {
 
@@ -42,6 +61,31 @@ function Prazos() {
         }
 
         carregarClientes();
+
+    }, []);
+
+    useEffect(() => {
+
+        async function carregar() {
+
+            try {
+
+                const dados =
+                    await listarTodasMovimentacoes();
+
+                setMovimentacoes(
+                    dados
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+            }
+
+        }
+
+        carregar();
 
     }, []);
 
@@ -156,6 +200,98 @@ function Prazos() {
                 <p className="text-sm text-gray-500 mt-1">
                     Controle jurídico de obrigações e vencimentos
                 </p>
+            </div>
+
+            <div className="md:px-20">
+                <Calendar
+                    onChange={setDataSelecionada}                    
+                    value={dataSelecionada}
+                    tileContent={({ date }) => {
+
+                        const possuiMovimentacao =
+                            movimentacoes.some(mov => {
+
+                                const dataMov =
+                                    new Date(
+                                        mov.dataMovimentacao
+                                    );
+
+                                return (
+                                    dataMov.toDateString() ===
+                                    date.toDateString()
+                                );
+
+                            });
+
+                        return possuiMovimentacao ? (
+                            <div className="flex justify-center mt-1">
+                                <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                            </div>
+                        ) : null;
+
+                    }}
+                />
+                <div className="mt-4">
+
+                    {movimentacoesDoDia.length === 0 ? (
+
+                        <div className="text-sm text-gray-500">
+                            Nenhuma movimentação nesta data.
+                        </div>
+
+                    ) : (
+
+                        movimentacoesDoDia.map(mov => (
+
+                            <div
+                                key={mov.id}
+                                className="
+                    border
+                    rounded-xl
+                    p-4
+                    mb-2
+                    hover:bg-gray-50
+                    transition
+                "
+                            >
+
+                                <div className="flex justify-between">
+
+                                    <div>
+
+                                        <div className="font-medium">
+                                            {mov.descricao}
+                                        </div>
+
+                                        <div className="text-sm text-gray-500">
+                                            Código: {mov.codigo}
+                                        </div>
+
+                                    </div>
+
+                                    <div className="text-sm text-indigo-600">
+
+                                        {new Date(
+                                            mov.dataMovimentacao
+                                        ).toLocaleTimeString(
+                                            "pt-BR",
+                                            {
+                                                hour: "2-digit",
+                                                minute: "2-digit"
+                                            }
+                                        )}
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        ))
+
+                    )}
+
+                </div>
             </div>
 
             <Card>
@@ -300,6 +436,8 @@ function Prazos() {
 
             </Card>
 
+            {/* Prazos dos processos
+            <h2>Prazos</h2>
             <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
 
                 {prazosOrdenados.map(p => (
@@ -420,7 +558,7 @@ function Prazos() {
                 ))}
 
             </div>
-
+*/}
         </div>
     );
 }
