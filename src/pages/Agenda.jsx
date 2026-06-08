@@ -7,6 +7,7 @@ import { doc, getDoc, getDocs, collection } from "firebase/firestore";
 import { useAuth } from "../hooks/useAuth";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import { useSegment } from "../hooks/useSegment";
 
 function Agenda() {
     const [consultas, setConsultas] = useState([]);
@@ -24,6 +25,9 @@ function Agenda() {
     const [buscaPaciente, setBuscaPaciente] = useState("");
     const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
     const [dataSelecionada, setDataSelecionada] = useState(new Date());
+
+    const segment = useSegment();
+    const labels = segment.labels;
 
     const eventosDoDia = consultas.filter((consulta) => {
         console.log(
@@ -648,7 +652,7 @@ function Agenda() {
                             onClick={() => abrirNovo(dataSelecionada, "08:00")}
                             className="px-3 py-2 bg-indigo-600 text-white rounded-lg"
                         >
-                            Nova consulta
+                            Agendar {labels.sessao}
                         </button>
 
                     </div>

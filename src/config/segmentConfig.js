@@ -111,8 +111,8 @@ export const segmentConfig = {
             { label: "Atendimentos", path: "/sessoes", icon: ClipboardList },
             { label: "Financeiro", path: "/financeiro", icon: CircleDollarSign },
             { label: "Documentos", path: "/documentos", icon: FileMinus },
-            { label: "Prazos", path: "/prazos", icon: AlarmClock },
             { label: "Processos", path: "/processos", icon: ShieldPlus },
+            { label: "Prazos", path: "/prazos", icon: AlarmClock },
             { label: "Relatórios", path: "/anamnese", icon: NotebookPen },
         ]
     },
